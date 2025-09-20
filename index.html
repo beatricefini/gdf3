@@ -2,43 +2,44 @@
 <html lang="it">
 <head>
   <meta charset="utf-8">
-  <title>AR Project 2</title>
+  <title>AR Project 3</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- A-Frame -->
   <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+
+  <!-- AR.js markerless -->
+  <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js/aframe/build/aframe-ar-nft.js"></script>
+
   <style>
-    html, body { margin:0; padding:0; width:100%; height:100%; overflow:hidden; }
-    video#cameraVideo {
-      position: fixed;
-      top:0;
-      left:0;
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      z-index:-1;
+    html, body, a-scene {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
     }
   </style>
 </head>
 <body>
-  <!-- Sfondo AR -->
-  <video id="cameraVideo" autoplay playsinline muted></video>
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    arjs="trackingMethod: best; sourceType: webcam; sourceWidth: 1280; sourceHeight: 720; debugUIEnabled: false;"
+  >
+    <!-- Camera AR -->
+    <a-camera
+      id="camera"
+      look-controls="enabled: false"
+      position="0 1.6 0"
+      camera
+    ></a-camera>
 
-  <a-scene embedded renderer="alpha: true; antialias: true" vr-mode-ui="enabled: false">
-    <!-- Camera più alta e leggermente inclinata -->
-    <a-camera id="camera" position="0 3 3" rotation="0 0 0" look-controls="enabled: false"></a-camera>
-
-    <!-- Container per i modelli -->
+    <!-- Container modelli -->
     <a-entity id="modelsContainer"></a-entity>
   </a-scene>
 
   <!-- Script principale -->
   <script src="js/main.js"></script>
-
-  <script>
-    // Forza VR su GitHub Pages
-    document.querySelector('a-scene').addEventListener('loaded', () => {
-      const scene = document.querySelector('a-scene');
-      if(scene.enterVR) scene.enterVR();
-    });
-  </script>
 </body>
 </html>
