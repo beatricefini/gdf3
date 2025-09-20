@@ -1,6 +1,9 @@
+// js/main.js
+
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.querySelector('#modelsContainer');
 
+  // Video per piece7
   const video7 = document.createElement('video');
   video7.id = 'video7';
   video7.src = 'videos/video7.mp4';
@@ -13,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Scritta iniziale
   const startText = document.createElement('a-text');
   startText.setAttribute('id','startText');
-  startText.setAttribute('value','Tap the screen\nto place your models');
+  startText.setAttribute('value','Tap the screen\nto create your\nown little cinema');
   startText.setAttribute('align','center');
   startText.setAttribute('color','#FFFFFF');
   startText.setAttribute('position','0 1.8 -1');
@@ -24,7 +27,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let firstClick = true;
   let currentIndex = 0;
-  let modelsAdded = 0;
 
   const models = [
     'models/piece1.glb',
@@ -36,27 +38,72 @@ document.addEventListener('DOMContentLoaded', () => {
     'models/piece7.glb'
   ];
 
-  // Posizioni relative alla hit-test (all'inizio sono vuote)
-  const placedPositions = [];
+  let floorY = null;
+  let wallZ = null;
 
-  // Funzione per creare modello
-  function placeModel(hitPosition) {
+  const cameraEl = document.querySelector('#camera');
+
+  // Funzione per rilevare pavimento e muro all'avvio
+  function detectSurfaces() {
+    const cameraObj = cameraEl.getObject3D('camera');
+
+    // Raycast verso il basso (pavimento)
+    const rayDown = new THREE.Raycaster();
+    rayDown.set(cameraObj.position, new THREE.Vector3(0, -1, 0));
+    // Intersezione con il mondo virtuale (terra)
+    const intersectsFloor = rayDown.intersectObjects([]);
+    floorY = intersectsFloor.length > 0 ? intersectsFloor[0].point.y : 0;
+
+    // Raycast verso avanti (muro)
+    const rayForward = new THREE.Raycaster();
+    const forwardDir = new THREE.Vector3(0, 0, -1);
+    forwardDir.applyQuaternion(cameraObj.quaternion);
+    rayForward.set(cameraObj.position, forwardDir);
+    const intersectsWall = rayForward.intersectObjects([]);
+    wallZ = intersectsWall.length > 0 ? intersectsWall[0].point.z : -3;
+  }
+
+  // Esegui la rilevazione delle superfici dopo 2 secondi
+  setTimeout(detectSurfaces, 2000);
+
+  window.addEventListener('click', () => {
+    if(firstClick){
+      if(startText) startText.setAttribute('visible','false');
+      firstClick = false;
+      return;
+    }
+
     if(currentIndex >= models.length) return;
 
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', models[currentIndex]);
-    piece.setAttribute('data-raycastable','true');
+    piece.setAttribute('data-raycastable', 'true');
 
-    // Posizione dal mondo reale (hit-test)
-    piece.setAttribute('position', hitPosition);
+    // Posizione predefinita basata sulle superfici rilevate
+    let pos = { x: 0, y: 0, z: -2 };
 
-    // Scala iniziale 0 per pop-up
+    if(currentIndex <= 2 && floorY !== null) {
+      // piece1-3 sul pavimento
+      pos = { x: (currentIndex - 1) * 0.5, y: floorY, z: -2 };
+    } else if(currentIndex === models.length - 1 && wallZ !== null) {
+      // piece7 vicino al muro
+      pos = { x: 0, y: floorY + 1.5, z: wallZ };
+    } else {
+      // altri modelli
+      pos = { x: (currentIndex % 2) * 0.5 - 0.25, y: floorY, z: -2.5 - (currentIndex*0.2) };
+    }
+
+    piece.setAttribute('position', `${pos.x} ${pos.y} ${pos.z}`);
+
+    // Scala iniziale 0
     piece.setAttribute('scale', { x:0, y:0, z:0 });
 
+    // Piccolo sbilanciamento iniziale
     const rotX = (Math.random() - 0.5) * 10;
     const rotY = (Math.random() - 0.5) * 10;
     piece.setAttribute('rotation', { x: rotX, y: rotY, z: 0 });
 
+    // Animazioni pop-up
     piece.setAttribute('animation__pop', {
       property: 'scale',
       from: '0 0 0',
@@ -73,7 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if(currentIndex === models.length - 1){
-      piece.setAttribute('id','piece7');
+      piece.setAttribute('id', 'piece7');
     }
 
     piece.addEventListener('model-loaded', () => {
@@ -82,10 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     container.appendChild(piece);
     currentIndex++;
-    modelsAdded++;
 
-    // Video piece7
-    if(modelsAdded === models.length) {
+    // Avvio video su piece7
+    if(currentIndex === models.length){
       setTimeout(() => {
         const piece7El = document.getElementById('piece7');
         if(piece7El){
@@ -96,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const videoTexture = new THREE.VideoTexture(video7);
                 videoTexture.flipY = false;
                 videoTexture.center.set(0.5,0.5);
-                videoTexture.repeat.x = -1; 
+                videoTexture.repeat.x = -1;
                 node.material.map = videoTexture;
                 node.material.needsUpdate = true;
               }
@@ -104,37 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
           }
           video7.play().catch(e => console.warn("Impossibile avviare il video:", e));
         }
-      },3000);
+      }, 3000);
     }
-  }
-
-  // Click sullo schermo con hit-test
-  window.addEventListener('click', (evt) => {
-    if(firstClick){
-      if(startText) startText.setAttribute('visible','false');
-      firstClick = false;
-      return;
-    }
-
-    const sceneEl = document.querySelector('a-scene');
-    const camera = document.querySelector('#camera');
-
-    // Raycast dal centro dello schermo
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2(0,0); // centro dello schermo
-    const cameraObj = camera.getObject3D('camera');
-    raycaster.setFromCamera(mouse, cameraObj);
-
-    // AR hit-test (tutte le entità con piano AR)
-    sceneEl.querySelectorAll('a-plane, a-entity').forEach(entity => {
-      const mesh = entity.getObject3D('mesh');
-      if(mesh){
-        const intersects = raycaster.intersectObject(mesh, true);
-        if(intersects.length > 0){
-          const hitPos = intersects[0].point;
-          placeModel({ x: hitPos.x, y: hitPos.y, z: hitPos.z });
-        }
-      }
-    });
   });
 });
