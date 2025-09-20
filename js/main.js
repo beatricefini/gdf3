@@ -38,8 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'models/piece7.glb'
   ];
 
-  let floorY = null;
-  let wallZ = null;
+  let floorY = 0;  // default pavimento
+  let wallZ = -3;  // default muro
 
   const cameraEl = document.querySelector('#camera');
 
@@ -47,23 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
   function detectSurfaces() {
     const cameraObj = cameraEl.getObject3D('camera');
 
-    // Raycast verso il basso (pavimento)
-    const rayDown = new THREE.Raycaster();
-    rayDown.set(cameraObj.position, new THREE.Vector3(0, -1, 0));
-    // Intersezione con il mondo virtuale (terra)
+    // Raycast verso il basso per pavimento
+    const rayDown = new THREE.Raycaster(cameraObj.position, new THREE.Vector3(0, -1, 0));
     const intersectsFloor = rayDown.intersectObjects([]);
     floorY = intersectsFloor.length > 0 ? intersectsFloor[0].point.y : 0;
 
-    // Raycast verso avanti (muro)
-    const rayForward = new THREE.Raycaster();
-    const forwardDir = new THREE.Vector3(0, 0, -1);
-    forwardDir.applyQuaternion(cameraObj.quaternion);
-    rayForward.set(cameraObj.position, forwardDir);
+    // Raycast in avanti per muro
+    const forwardDir = new THREE.Vector3(0, 0, -1).applyQuaternion(cameraObj.quaternion);
+    const rayForward = new THREE.Raycaster(cameraObj.position, forwardDir);
     const intersectsWall = rayForward.intersectObjects([]);
     wallZ = intersectsWall.length > 0 ? intersectsWall[0].point.z : -3;
   }
 
-  // Esegui la rilevazione delle superfici dopo 2 secondi
+  // Esegui rilevazione superfici dopo 2 secondi
   setTimeout(detectSurfaces, 2000);
 
   window.addEventListener('click', () => {
@@ -80,12 +76,12 @@ document.addEventListener('DOMContentLoaded', () => {
     piece.setAttribute('data-raycastable', 'true');
 
     // Posizione predefinita basata sulle superfici rilevate
-    let pos = { x: 0, y: 0, z: -2 };
+    let pos = { x: 0, y: floorY, z: -2 };
 
-    if(currentIndex <= 2 && floorY !== null) {
+    if(currentIndex <= 2) {
       // piece1-3 sul pavimento
       pos = { x: (currentIndex - 1) * 0.5, y: floorY, z: -2 };
-    } else if(currentIndex === models.length - 1 && wallZ !== null) {
+    } else if(currentIndex === models.length - 1) {
       // piece7 vicino al muro
       pos = { x: 0, y: floorY + 1.5, z: wallZ };
     } else {
