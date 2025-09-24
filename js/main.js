@@ -1,17 +1,27 @@
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('pieces');
-  const initialScale = 0.2;       // scala iniziale dei pezzi in cerchio
-  const centerScale = 0.3;        // scala dei pezzi al centro e del pezzo finale
-  const raggio = 0.3;             // distanza dal centro per la disposizione circolare
+
+  const centerScale = 0.3; // scala dei pezzi al centro e del modello finale
+  const raggio = 0.3;      // distanza dal centro per la disposizione circolare
 
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
+
+  // Scala iniziale per ciascun pezzo (per uniformare i pezzi più piccoli)
+  const initialScales = [
+    0.2,  // piece1
+    0.25, // piece2
+    0.2,  // piece3
+    0.25, // piece4
+    0.25, // piece5
+    0.25  // piece6
+  ];
 
   // Centro e snap
   const centerPos = { x: 0, y: 0, z: 0 };
   const raggioSnap = 0.1;
 
-  // Creazione dei pezzi in cerchio
+  // Creazione dei pezzi in cerchio con scale personalizzate
   for (let i = 0; i < modelIds.length; i++) {
     const angle = (i / modelIds.length) * Math.PI * 2;
     const x = Math.cos(angle) * raggio;
@@ -20,8 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
     piece.setAttribute('position', { x, y, z: 0 });
-    piece.setAttribute('scale', { x: initialScale, y: initialScale, z: initialScale });
-    piece.dataset.locked = "false"; // inizialmente sbloccato
+    piece.setAttribute('scale', {
+      x: initialScales[i],
+      y: initialScales[i],
+      z: initialScales[i]
+    });
+    piece.dataset.locked = "false";
     container.appendChild(piece);
     pieces.push(piece);
   }
