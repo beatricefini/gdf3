@@ -15,17 +15,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
 
+  // Centro e snap
+  const centerPos = { x: 0, y: 0, z: 0 };
+  const raggioSnap = 0.1;
+  const pezzoSnapScale = 0.25;
+
   // Creazione dei pezzi
   for (let i = 0; i < modelIds.length; i++) {
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
     piece.setAttribute('position', positions[i]);
     piece.setAttribute('scale', { x: scale, y: scale, z: scale });
+    piece.dataset.locked = "false"; // inizialmente sbloccato
     container.appendChild(piece);
     pieces.push(piece);
   }
 
-  // Variabili drag
+  // Drag variables
   let selectedPiece = null;
   const cameraEl = document.querySelector('a-camera');
   const raycaster = new THREE.Raycaster();
@@ -41,50 +47,80 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function checkSnap(piece) {
+    const pos = piece.object3D.position;
+    const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.y - centerPos.y)**2);
+    if (distanza < raggioSnap) {
+      piece.setAttribute('position', { ...centerPos, z: 0 });
+      piece.setAttribute('scale', { x: pezzoSnapScale, y: pezzoSnapScale, z: pezzoSnapScale });
+      piece.dataset.locked = "true";
+    }
+  }
+
   function onPointerDown(event){
     updateMouse(event);
     raycaster.setFromCamera(mouse, cameraEl.getObject3D('camera'));
 
     const intersects = raycaster.intersectObjects(
-      pieces.map(p => p.object3D), true
+      pieces.filter(p => p.dataset.locked === "false").map(p => p.object3D), true
     );
 
     if(intersects.length > 0){
       selectedPiece = intersects[0].object.el;
-      // Piccolo feedback visivo
-      selectedPiece.object3D.position.y += 0.01;
+      selectedPiece.object3D.position.y += 0.01; // piccolo feedback
     }
   }
 
   function onPointerMove(event){
-    if(!selectedPiece) return;
+    if(!selectedPiece || selectedPiece.dataset.locked === "true") return;
     updateMouse(event);
     raycaster.setFromCamera(mouse, cameraEl.getObject3D('camera'));
 
-    // Calcolo posizione target sul piano Z=0
     const distance = cameraEl.object3D.position.z || 1;
     const dir = new THREE.Vector3();
     raycaster.ray.direction.clone().normalize().multiplyScalar(distance);
     const targetPos = raycaster.ray.origin.clone().add(dir);
 
-    // Interpolazione lineare per movimento fluido
+    // Movimento fluido
     const currentPos = selectedPiece.object3D.position;
-    const lerpFactor = 0.15; // più piccolo = più lento
+    const lerpFactor = 0.15;
     currentPos.x += (targetPos.x - currentPos.x) * lerpFactor;
     currentPos.y += (targetPos.y - currentPos.y) * lerpFactor;
-    currentPos.z = 0; // piano fisso
-
+    currentPos.z = 0;
     selectedPiece.setAttribute('position', {
       x: currentPos.x,
       y: currentPos.y,
       z: 0
     });
+
+    // Snap automatico
+    checkSnap(selectedPiece);
+
+    // Se tutti i pezzi sono bloccati, mostra pezzo finale
+    if(pieces.every(p => p.dataset.locked === "true")){
+      // rimuove pezzi originali
+      pieces.forEach(p => { if(p.parentNode) p.parentNode.removeChild(p); });
+
+      const finalShape = document.createElement('a-entity');
+      finalShape.setAttribute('gltf-model','models/piece_final.glb');
+      finalShape.setAttribute('position',{...centerPos});
+      finalShape.setAttribute('scale',{x:0.5, y:0.5, z:0.5});
+      container.appendChild(finalShape);
+
+      finalShape.setAttribute('animation__float', {
+        property: 'position',
+        dir: 'alternate',
+        dur: 1000,
+        easing: 'easeInOutSine',
+        loop: true,
+        to: `${centerPos.x} ${centerPos.y + 0.3} ${centerPos.z}`
+      });
+    }
   }
 
   function onPointerUp(){
     if(selectedPiece){
-      // Reset feedback visivo
-      selectedPiece.object3D.position.y -= 0.01;
+      selectedPiece.object3D.position.y -= 0.01; // reset feedback
       selectedPiece = null;
     }
   }
