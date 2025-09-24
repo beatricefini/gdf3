@@ -2,8 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('pieces');
 
   const centerScale = 0.3; // scala dei pezzi al centro e del modello finale
-  const raggio = 0.3;      // distanza dal centro per la disposizione circolare
-  const height = 0.15;     // altezza dei pezzi per centrarli visivamente
+  const zPos = 0;          // piano parallelo al marker
 
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
@@ -18,20 +17,23 @@ document.addEventListener('DOMContentLoaded', () => {
     0.35  // piece6 più piccolo
   ];
 
-  // Centro e snap
-  const centerPos = { x: 0, y: height, z: 0 }; // centro rialzato
+  // Parametri ellisse verticale
+  const a = 0.25; // semi-asse orizzontale (X)
+  const b = 0.45; // semi-asse verticale (Y)
+
+  // Centro di snap
+  const centerPos = { x: 0, y: 0, z: zPos };
   const raggioSnap = 0.1;
 
-  // Creazione dei pezzi in cerchio attorno al centro del marker (X-Z)
+  // Creazione dei pezzi lungo l'ellisse verticale
   for (let i = 0; i < modelIds.length; i++) {
-    const angle = (i / modelIds.length) * Math.PI * 2;
-    const x = Math.cos(angle) * raggio;
-    const z = Math.sin(angle) * raggio;
-    const y = height; // altezza uniforme
+    const theta = (i / modelIds.length) * 2 * Math.PI;
+    const x = Math.cos(theta) * a;
+    const y = Math.sin(theta) * b;
 
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
-    piece.setAttribute('position', { x, y, z });
+    piece.setAttribute('position', { x, y, z: zPos });
     piece.setAttribute('scale', {
       x: initialScales[i],
       y: initialScales[i],
@@ -60,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function checkSnap(piece) {
     const pos = piece.object3D.position;
-    const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.z - centerPos.z)**2);
+    const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.y - centerPos.y)**2 + (pos.z - centerPos.z)**2);
     if (distanza < raggioSnap) {
       piece.setAttribute('position', { ...centerPos });
       piece.setAttribute('scale', { x: centerScale, y: centerScale, z: centerScale });
@@ -97,7 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const lerpFactor = 0.15;
     currentPos.x += (targetPos.x - currentPos.x) * lerpFactor;
     currentPos.y += (targetPos.y - currentPos.y) * lerpFactor;
-    currentPos.z += (targetPos.z - currentPos.z) * lerpFactor;
+    currentPos.z = zPos; // blocca profondità
     selectedPiece.setAttribute('position', {
       x: currentPos.x,
       y: currentPos.y,
@@ -146,4 +148,5 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('touchmove', onPointerMove, {passive:false});
   window.addEventListener('touchend', onPointerUp);
 });
+
 
