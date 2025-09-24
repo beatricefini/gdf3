@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+  </head>
+  <body>
+    <a-scene 
+      mindar-image="imageTargetSrc: targets/target.mind;
+      filterMinCF: 0.0001; 
+      filterBeta: 0.1; 
+      missTolerance: 10;"
+      color-space="sRGB" 
+      renderer="colorManagement: true" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
+
+      <a-assets>
+        <img id="via_pratello" src="https://cdn.glitch.global/9f04977a-e4e3-400a-b333-8f1e68ac8cf9/via_pratello.png?v=1741110757377" />
+      </a-assets>
+
+      <!-- Camera posizionata al centro -->
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+      <!-- Luci per rendere visibile l'immagine -->
+      <a-entity light="type: ambient; color: #ffffff; intensity: 0.8"></a-entity>
+      <a-entity light="type: directional; color: #ffffff; intensity: 0.6" position="0 1 1"></a-entity>
+
+      <!-- Target AR -->
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-image 
+          src="#via_pratello" 
+          position="0 0 0" 
+          width="1" 
+          height="0.552" 
+          rotation="0 0 0" 
+          scale="1 1 1">
+        </a-image>
+      </a-entity>
+      
+    </a-scene>
+  </body>
+</html>
