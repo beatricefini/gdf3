@@ -1,23 +1,25 @@
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('pieces');
-  const models = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
-  const raggio = 0.3;      // raggio del cerchio
-  const zFixed = 0;        // profondità
-  const pezzoScale = 0.2;
-  const pieces = [];
+  const scale = 0.2; // scala dei modelli
 
-  // Creazione pezzi GLB in cerchio (x e y)
-  for (let i = 0; i < models.length; i++) {
-    const angle = (i / models.length) * 2 * Math.PI;
-    const x = Math.cos(angle) * raggio;
-    const y = Math.sin(angle) * raggio + 0.2; // offset sopra il marker
+  // Posizioni manuali
+  const positions = [
+    { x: -0.3, y: 0, z: 0 },   // piece1: sinistra
+    { x: 0, y: -0.3, z: 0 },   // piece2: basso
+    { x: 0.3, y: 0, z: 0 },    // piece3: destra
+    { x: 0, y: 0.3, z: 0 },    // piece4: alto
+    { x: 0.2, y: -0.2, z: 0 }, // piece5: basso a destra
+    { x: -0.2, y: 0.2, z: 0 }  // piece6: alto a sinistra
+  ];
 
+  const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
+
+  for (let i = 0; i < modelIds.length; i++) {
     const piece = document.createElement('a-entity');
-    piece.setAttribute('gltf-model', models[i]);
-    piece.setAttribute('position', { x, y, z: zFixed });
-    piece.setAttribute('scale', { x: pezzoScale, y: pezzoScale, z: pezzoScale });
+    piece.setAttribute('gltf-model', modelIds[i]);
+    piece.setAttribute('position', positions[i]);
+    piece.setAttribute('scale', { x: scale, y: scale, z: scale });
 
     container.appendChild(piece);
-    pieces.push(piece);
   }
 });
