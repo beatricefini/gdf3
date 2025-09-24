@@ -18,26 +18,16 @@ document.addEventListener('DOMContentLoaded', () => {
     0.35  // piece6 più piccolo
   ];
 
-  // Offset Z per dare profondità 3D
-  const zOffsets = [
-    0.00,  // piece1
-    0.05,  // piece2
-    -0.03, // piece3
-    0.07,  // piece4
-    -0.05, // piece5
-    0.02   // piece6
-  ];
-
   // Centro e snap
   const centerPos = { x: 0, y: height, z: 0 }; // centro rialzato
   const raggioSnap = 0.1;
 
-  // Creazione dei pezzi in cerchio attorno al centro del marker con profondità variabile
+  // Creazione dei pezzi in cerchio attorno al centro del marker (X-Z)
   for (let i = 0; i < modelIds.length; i++) {
     const angle = (i / modelIds.length) * Math.PI * 2;
     const x = Math.cos(angle) * raggio;
-    const z = Math.sin(angle) * raggio + zOffsets[i]; // aggiungi offset Z
-    const y = height; // rialza i pezzi verso il centro
+    const z = Math.sin(angle) * raggio;
+    const y = height; // altezza uniforme
 
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
