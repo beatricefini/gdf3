@@ -16,26 +16,29 @@
       device-orientation-permission-ui="enabled: false">
 
       <a-assets>
-        <img id="via_pratello" src="https://cdn.glitch.global/9f04977a-e4e3-400a-b333-8f1e68ac8cf9/via_pratello.png?v=1741110757377" />
+        <a-asset-item id="piece1" src="models/piece1.gltf"></a-asset-item>
+        <a-asset-item id="piece2" src="models/piece2.gltf"></a-asset-item>
+        <a-asset-item id="piece3" src="models/piece3.gltf"></a-asset-item>
+        <a-asset-item id="piece4" src="models/piece4.gltf"></a-asset-item>
+        <a-asset-item id="piece5" src="models/piece5.gltf"></a-asset-item>
+        <a-asset-item id="piece6" src="models/piece6.gltf"></a-asset-item>
       </a-assets>
 
-      <!-- Camera posizionata al centro -->
+      <!-- Camera -->
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <!-- Luci per rendere visibile l'immagine -->
+      <!-- Luci -->
       <a-entity light="type: ambient; color: #ffffff; intensity: 0.8"></a-entity>
       <a-entity light="type: directional; color: #ffffff; intensity: 0.6" position="0 1 1"></a-entity>
 
-      <!-- Target AR -->
+      <!-- Target AR con 6 modelli a cerchio -->
       <a-entity mindar-image-target="targetIndex: 0">
-        <a-image 
-          src="#via_pratello" 
-          position="0 0 0" 
-          width="1" 
-          height="0.552" 
-          rotation="0 0 0" 
-          scale="1 1 1">
-        </a-image>
+        <a-gltf-model src="#piece1" position="1 0 0" scale="0.5 0.5 0.5"></a-gltf-model>
+        <a-gltf-model src="#piece2" position="0.5 0 0.866" scale="0.5 0.5 0.5"></a-gltf-model>
+        <a-gltf-model src="#piece3" position="-0.5 0 0.866" scale="0.5 0.5 0.5"></a-gltf-model>
+        <a-gltf-model src="#piece4" position="-1 0 0" scale="0.5 0.5 0.5"></a-gltf-model>
+        <a-gltf-model src="#piece5" position="-0.5 0 -0.866" scale="0.5 0.5 0.5"></a-gltf-model>
+        <a-gltf-model src="#piece6" position="0.5 0 -0.866" scale="0.5 0.5 0.5"></a-gltf-model>
       </a-entity>
       
     </a-scene>
