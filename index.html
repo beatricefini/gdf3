@@ -30,15 +30,11 @@
     <a-entity light="type: directional; color: #ffffff; intensity: 0.6" position="0 1 1"></a-entity>
 
     <a-entity mindar-image-target="targetIndex: 0" id="marker">
-      <!-- Modelli posizionati a cerchio -->
-      <a-gltf-model src="#piece1" position="0.3 0 0" scale="0.2 0.2 0.2"></a-gltf-model>
-      <a-gltf-model src="#piece2" position="0.15 0 0.26" scale="0.2 0.2 0.2"></a-gltf-model>
-      <a-gltf-model src="#piece3" position="-0.15 0 0.26" scale="0.2 0.2 0.2"></a-gltf-model>
-      <a-gltf-model src="#piece4" position="-0.3 0 0" scale="0.2 0.2 0.2"></a-gltf-model>
-      <a-gltf-model src="#piece5" position="-0.15 0 -0.26" scale="0.2 0.2 0.2"></a-gltf-model>
-      <a-gltf-model src="#piece6" position="0.15 0 -0.26" scale="0.2 0.2 0.2"></a-gltf-model>
+      <a-entity id="pieces"></a-entity>
     </a-entity>
 
   </a-scene>
+
+  <script src="js/main.js"></script>
 </body>
 </html>
