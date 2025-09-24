@@ -2,16 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('pieces');
   const initialScale = 0.2;       // scala iniziale dei pezzi in cerchio
   const centerScale = 0.3;        // scala dei pezzi al centro e del pezzo finale
-
-  // Posizioni iniziali manuali (cerchio approssimativo)
-  const positions = [
-    { x: -0.3, y: 0, z: 0 },      // sinistra
-    { x: 0, y: -0.3, z: 0 },      // basso
-    { x: 0.3, y: 0, z: 0 },       // destra
-    { x: 0, y: 0.3, z: 0 },       // alto
-    { x: 0.2, y: -0.2, z: 0 },    // basso-destra
-    { x: -0.2, y: 0.2, z: 0 }     // alto-sinistra
-  ];
+  const raggio = 0.3;             // distanza dal centro per la disposizione circolare
 
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
@@ -20,11 +11,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const centerPos = { x: 0, y: 0, z: 0 };
   const raggioSnap = 0.1;
 
-  // Creazione dei pezzi
+  // Creazione dei pezzi in cerchio
   for (let i = 0; i < modelIds.length; i++) {
+    const angle = (i / modelIds.length) * Math.PI * 2;
+    const x = Math.cos(angle) * raggio;
+    const y = Math.sin(angle) * raggio;
+
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
-    piece.setAttribute('position', positions[i]);
+    piece.setAttribute('position', { x, y, z: 0 });
     piece.setAttribute('scale', { x: initialScale, y: initialScale, z: initialScale });
     piece.dataset.locked = "false"; // inizialmente sbloccato
     container.appendChild(piece);
@@ -98,7 +93,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Se tutti i pezzi sono bloccati, mostra pezzo finale
     if(pieces.every(p => p.dataset.locked === "true")){
-      // rimuove pezzi originali
       pieces.forEach(p => { if(p.parentNode) p.parentNode.removeChild(p); });
 
       const finalShape = document.createElement('a-entity');
@@ -136,3 +130,4 @@ document.addEventListener('DOMContentLoaded', () => {
   window.addEventListener('touchmove', onPointerMove, {passive:false});
   window.addEventListener('touchend', onPointerUp);
 });
+
