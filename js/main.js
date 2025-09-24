@@ -9,9 +9,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Scala iniziale ottimizzata per uniformare visivamente i pezzi più piccoli
   const initialScales = [
-    0.25, // piece1
+    0.2, // piece1
     0.35, // piece2 più piccolo
-    0.25, // piece3
+    0.2, // piece3
     0.35, // piece4 più piccolo
     0.35, // piece5 più piccolo
     0.35  // piece6 più piccolo
