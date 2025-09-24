@@ -21,15 +21,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const centerPos = { x: 0, y: 0, z: 0 };
   const raggioSnap = 0.1;
 
-  // Creazione dei pezzi in cerchio con scale personalizzate
+  // Creazione dei pezzi in cerchio sul piano parallelo al marker (X-Z)
   for (let i = 0; i < modelIds.length; i++) {
-    const angle = (i / modelIds.length) * Math.PI * 2; // distribuzione circolare
+    const angle = (i / modelIds.length) * Math.PI * 2;
     const x = Math.cos(angle) * raggio;
-    const y = Math.sin(angle) * raggio;
+    const z = Math.sin(angle) * raggio;
+    const y = 0; // altezza uniforme sul marker
 
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
-    piece.setAttribute('position', { x, y, z: 0 });
+    piece.setAttribute('position', { x, y, z });
     piece.setAttribute('scale', {
       x: initialScales[i],
       y: initialScales[i],
@@ -58,9 +59,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function checkSnap(piece) {
     const pos = piece.object3D.position;
-    const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.y - centerPos.y)**2);
+    const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.z - centerPos.z)**2);
     if (distanza < raggioSnap) {
-      piece.setAttribute('position', { ...centerPos, z: 0 });
+      piece.setAttribute('position', { ...centerPos, y: 0 });
       piece.setAttribute('scale', { x: centerScale, y: centerScale, z: centerScale });
       piece.dataset.locked = "true";
     }
@@ -95,11 +96,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const lerpFactor = 0.15;
     currentPos.x += (targetPos.x - currentPos.x) * lerpFactor;
     currentPos.y += (targetPos.y - currentPos.y) * lerpFactor;
-    currentPos.z = 0;
+    currentPos.z += (targetPos.z - currentPos.z) * lerpFactor;
     selectedPiece.setAttribute('position', {
       x: currentPos.x,
       y: currentPos.y,
-      z: 0
+      z: currentPos.z
     });
 
     // Snap automatico
