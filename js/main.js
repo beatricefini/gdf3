@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const centerScale = 0.3; // scala dei pezzi al centro e del modello finale
   const raggio = 0.3;      // distanza dal centro per la disposizione circolare
+  const height = 0.15;     // altezza dei pezzi per centrarli visivamente
 
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
@@ -18,15 +19,15 @@ document.addEventListener('DOMContentLoaded', () => {
   ];
 
   // Centro e snap
-  const centerPos = { x: 0, y: 0, z: 0 };
+  const centerPos = { x: 0, y: height, z: 0 }; // centro rialzato
   const raggioSnap = 0.1;
 
-  // Creazione dei pezzi in cerchio sul piano parallelo al marker (X-Z)
+  // Creazione dei pezzi in cerchio attorno al centro del marker
   for (let i = 0; i < modelIds.length; i++) {
     const angle = (i / modelIds.length) * Math.PI * 2;
     const x = Math.cos(angle) * raggio;
     const z = Math.sin(angle) * raggio;
-    const y = 0; // altezza uniforme sul marker
+    const y = height; // rialza i pezzi verso il centro
 
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
@@ -61,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const pos = piece.object3D.position;
     const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.z - centerPos.z)**2);
     if (distanza < raggioSnap) {
-      piece.setAttribute('position', { ...centerPos, y: 0 });
+      piece.setAttribute('position', { ...centerPos });
       piece.setAttribute('scale', { x: centerScale, y: centerScale, z: centerScale });
       piece.dataset.locked = "true";
     }
