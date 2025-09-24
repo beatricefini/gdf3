@@ -7,12 +7,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
 
-  // Scala iniziale ottimizzata per uniformare visivamente i pezzi più piccoli
+  // Scala iniziale impostata da te
   const initialScales = [
     0.15, // piece1
     0.35, // piece2 più piccolo
     0.15, // piece3
-    0.2, // piece4 più piccolo
+    0.2,  // piece4 più piccolo
     0.35, // piece5 più piccolo
     0.35  // piece6 più piccolo
   ];
@@ -21,9 +21,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const centerPos = { x: 0, y: 0, z: 0 };
   const raggioSnap = 0.1;
 
-  // Creazione dei pezzi in cerchio con scale ottimizzate
+  // Creazione dei pezzi in cerchio con scale personalizzate
   for (let i = 0; i < modelIds.length; i++) {
-    const angle = (i / modelIds.length) * Math.PI * 2;
+    const angle = (i / modelIds.length) * Math.PI * 2; // distribuzione circolare
     const x = Math.cos(angle) * raggio;
     const y = Math.sin(angle) * raggio;
 
