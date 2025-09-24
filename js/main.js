@@ -7,21 +7,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
 
-  // Scala iniziale per ciascun pezzo (per uniformare i pezzi più piccoli)
+  // Scala iniziale ottimizzata per uniformare visivamente i pezzi più piccoli
   const initialScales = [
-    0.2,  // piece1
-    0.25, // piece2
-    0.2,  // piece3
-    0.25, // piece4
-    0.25, // piece5
-    0.25  // piece6
+    0.25, // piece1
+    0.35, // piece2 più piccolo
+    0.25, // piece3
+    0.35, // piece4 più piccolo
+    0.35, // piece5 più piccolo
+    0.35  // piece6 più piccolo
   ];
 
   // Centro e snap
   const centerPos = { x: 0, y: 0, z: 0 };
   const raggioSnap = 0.1;
 
-  // Creazione dei pezzi in cerchio con scale personalizzate
+  // Creazione dei pezzi in cerchio con scale ottimizzate
   for (let i = 0; i < modelIds.length; i++) {
     const angle = (i / modelIds.length) * Math.PI * 2;
     const x = Math.cos(angle) * raggio;
@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const finalShape = document.createElement('a-entity');
       finalShape.setAttribute('gltf-model','models/piece_final.glb');
       finalShape.setAttribute('position',{...centerPos});
-      finalShape.setAttribute('scale',{x: centerScale, y: centerScale, z: centerScale}); // stessa scala dei pezzi
+      finalShape.setAttribute('scale',{x: centerScale, y: centerScale, z: centerScale});
       container.appendChild(finalShape);
 
       // animazione fluttuazione
