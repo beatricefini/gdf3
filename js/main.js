@@ -1,15 +1,16 @@
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('pieces');
-  const scale = 0.2;
+  const initialScale = 0.2;       // scala iniziale dei pezzi in cerchio
+  const centerScale = 0.3;        // scala dei pezzi al centro e del pezzo finale
 
-  // Posizioni iniziali manuali
+  // Posizioni iniziali manuali (cerchio approssimativo)
   const positions = [
-    { x: -0.3, y: 0, z: 0 },
-    { x: 0, y: -0.3, z: 0 },
-    { x: 0.3, y: 0, z: 0 },
-    { x: 0, y: 0.3, z: 0 },
-    { x: 0.2, y: -0.2, z: 0 },
-    { x: -0.2, y: 0.2, z: 0 }
+    { x: -0.3, y: 0, z: 0 },      // sinistra
+    { x: 0, y: -0.3, z: 0 },      // basso
+    { x: 0.3, y: 0, z: 0 },       // destra
+    { x: 0, y: 0.3, z: 0 },       // alto
+    { x: 0.2, y: -0.2, z: 0 },    // basso-destra
+    { x: -0.2, y: 0.2, z: 0 }     // alto-sinistra
   ];
 
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
@@ -18,14 +19,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // Centro e snap
   const centerPos = { x: 0, y: 0, z: 0 };
   const raggioSnap = 0.1;
-  const pezzoSnapScale = 0.25;
 
   // Creazione dei pezzi
   for (let i = 0; i < modelIds.length; i++) {
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
     piece.setAttribute('position', positions[i]);
-    piece.setAttribute('scale', { x: scale, y: scale, z: scale });
+    piece.setAttribute('scale', { x: initialScale, y: initialScale, z: initialScale });
     piece.dataset.locked = "false"; // inizialmente sbloccato
     container.appendChild(piece);
     pieces.push(piece);
@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.y - centerPos.y)**2);
     if (distanza < raggioSnap) {
       piece.setAttribute('position', { ...centerPos, z: 0 });
-      piece.setAttribute('scale', { x: pezzoSnapScale, y: pezzoSnapScale, z: pezzoSnapScale });
+      piece.setAttribute('scale', { x: centerScale, y: centerScale, z: centerScale });
       piece.dataset.locked = "true";
     }
   }
@@ -104,9 +104,10 @@ document.addEventListener('DOMContentLoaded', () => {
       const finalShape = document.createElement('a-entity');
       finalShape.setAttribute('gltf-model','models/piece_final.glb');
       finalShape.setAttribute('position',{...centerPos});
-      finalShape.setAttribute('scale',{x:0.5, y:0.5, z:0.5});
+      finalShape.setAttribute('scale',{x: centerScale, y: centerScale, z: centerScale}); // stessa scala dei pezzi
       container.appendChild(finalShape);
 
+      // animazione fluttuazione
       finalShape.setAttribute('animation__float', {
         property: 'position',
         dir: 'alternate',
