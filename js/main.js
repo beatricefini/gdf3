@@ -7,29 +7,25 @@ document.addEventListener('DOMContentLoaded', () => {
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
 
-  // Scala iniziale
-  const initialScales = [0.15,0.35,0.15,0.2,0.35,0.35];
+  const initialScales = [0.15, 0.15, 0.15, 0.15, 0.15, 0.15]; // tutti uguali per animazione
 
-  // Posizioni personalizzate (ellisse verticale)
+  // Posizioni personalizzate
   const positions = [
-    { x: -0.25, y: 0, z: zPos },   // piece1 sinistra
+    { x: 0.25, y: 0, z: zPos },    // piece1 destra
     { x: 0, y: 0.45, z: zPos },    // piece2 sopra
-    { x: 0.25, y: 0, z: zPos },    // piece3 destra
+    { x: -0.25, y: 0, z: zPos },   // piece3 sinistra
     { x: -0.15, y: -0.45, z: zPos },// piece4 sotto
     { x: 0.15, y: -0.45, z: zPos }, // piece5 sotto
     { x: 0, y: 0.45, z: zPos }      // piece6 sopra
   ];
 
-  // Funzione per creare i pezzi con animazione pop-up
-  function createPiece(i) {
+  // Creazione pezzi con animazione pop-up
+  for (let i = 0; i < modelIds.length; i++) {
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
     piece.setAttribute('position', positions[i]);
     piece.setAttribute('scale', { x: 0, y: 0, z: 0 }); // inizio da 0
     piece.dataset.locked = "false";
-
-    container.appendChild(piece);
-    pieces.push(piece);
 
     // Animazione pop-up
     piece.setAttribute('animation__pop', {
@@ -39,11 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
       delay: i * 300, // comparsa uno alla volta
       easing: 'easeOutElastic'
     });
-  }
 
-  // Creazione pezzi
-  for (let i = 0; i < modelIds.length; i++) {
-    createPiece(i);
+    container.appendChild(piece);
+    pieces.push(piece);
   }
 
   // Drag variables
