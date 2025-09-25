@@ -8,12 +8,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Posizioni ellittiche come richiesto
   const positions = [
-    { x: -0.25, y: 0, z: 0 },   // piece1 a sinistra
-    { x: 0, y: 0.45, z: 0 },    // piece2 sopra
-    { x: 0.25, y: 0, z: 0 },    // piece3 a destra
-    { x: -0.15, y: -0.45, z: 0 }, // piece4 sotto sinistra
+    { x: -0.2, y: 0, z: 0 },   // piece1 a sinistra
+    { x: -0.1, y: 0.6, z: 0 },    // piece2 sopra
+    { x: 0.2, y: 0, z: 0 },    // piece3 a destra
+    { x: 0.15, y: -0.5, z: 0 }, // piece4 sotto sinistra
     { x: 0.15, y: -0.45, z: 0 },  // piece5 sotto destra
-    { x: -0.05, y: 0.35, z: 0 }   // piece6 sopra leggermente a sinistra
+    { x: 0.1, y: 0.3, z: 0 }   // piece6 sopra leggermente a sinistra
   ];
 
   // Scale iniziali (puoi regolare)
