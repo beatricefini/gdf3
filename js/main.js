@@ -6,32 +6,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
 
-  // Posizioni ellittiche come richiesto
   const positions = [
-    { x: -0.2, y: 0, z: 0 },   // piece1 a sinistra
-    { x: -0.5, y: 0.6, z: 0 },    // piece2 sopra
-    { x: 0.2, y: 0, z: 0 },    // piece3 a destra
-    { x: 0.15, y: -0.5, z: 0 }, // piece4 sotto sinistra
-    { x: 0.15, y: -0.45, z: 0 },  // piece5 sotto destra
-    { x: -0.1, y: 0.3, z: 0 }   // piece6 sopra leggermente a sinistra
+    { x: -0.2, y: 0, z: 0 },  
+    { x: -0.5, y: 0.6, z: 0 }, 
+    { x: 0.2, y: 0, z: 0 },   
+    { x: 0.15, y: -0.5, z: 0 }, 
+    { x: 0.15, y: -0.45, z: 0 }, 
+    { x: -0.1, y: 0.3, z: 0 }  
   ];
 
-  // Scale iniziali (puoi regolare)
   const scales = [0.15,0.35,0.15,0.2,0.35,0.35];
   const centerPos = { x: 0, y: 0, z: 0 };
   const centerScale = 0.3;
   const raggioSnap = 0.1;
 
-  // Funzione per creare un pezzo
+  // --- SCRITTA DRAG HERE ---
+  const dragText = document.createElement('a-text');
+  dragText.setAttribute('value', 'Drag Here');
+  dragText.setAttribute('align', 'center');
+  dragText.setAttribute('color', '#FFD700');
+  dragText.setAttribute('position', `${centerPos.x} ${centerPos.y + 0.05} ${centerPos.z}`);
+  dragText.setAttribute('scale', '0.25 0.25 0.25');
+  dragText.setAttribute('id', 'dragText');
+  container.appendChild(dragText);
+
   function createPiece(idx){
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[idx]);
     piece.setAttribute('position', { x: positions[idx].x, y: positions[idx].y, z: positions[idx].z });
-    piece.setAttribute('scale', { x: 0, y: 0, z: 0 }); // parte invisibile
+    piece.setAttribute('scale', { x: 0, y: 0, z: 0 });
     piece.dataset.locked = "false";
 
     piece.addEventListener('model-loaded', () => {
-      // animazione pop-up verso la posizione e scala definitiva
       piece.setAttribute('animation__pop', {
         property: 'scale',
         from: '0 0 0',
@@ -96,12 +102,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const lerpFactor = 0.15;
     currentPos.x += (targetPos.x - currentPos.x) * lerpFactor;
     currentPos.y += (targetPos.y - currentPos.y) * lerpFactor;
-    currentPos.z = 0; // piano marker
+    currentPos.z = 0;
     selectedPiece.setAttribute('position', currentPos);
 
     checkSnap(selectedPiece);
 
+    // se tutti i pezzi sono al centro, rimuovi scritta drag
     if(pieces.every(p=>p.dataset.locked==='true')){
+      const textEl = document.getElementById('dragText');
+      if(textEl) textEl.parentNode.removeChild(textEl);
+
       pieces.forEach(p => { if(p.parentNode) p.parentNode.removeChild(p); });
       const finalShape = document.createElement('a-entity');
       finalShape.setAttribute('gltf-model','models/piece_final.glb');
@@ -133,13 +143,13 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener('touchmove', onPointerMove, {passive:false});
   window.addEventListener('touchend', onPointerUp);
 
-  // --- POP-UP ANIMATION DOPO TARGET FOUND ---
+  // POP-UP ANIMATION DOPO TARGET FOUND
   marker.addEventListener('targetFound', () => {
-    pieces.length = 0; // reset in caso
+    pieces.length = 0;
     let delay = 0;
     for(let i=0;i<modelIds.length;i++){
       setTimeout(()=> createPiece(i), delay);
-      delay += 700; // 700ms tra un pezzo e l'altro
+      delay += 700;
     }
   });
 });
