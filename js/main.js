@@ -1,47 +1,49 @@
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.getElementById('pieces');
 
-  const centerScale = 0.3; // scala dei pezzi al centro e del modello finale
-  const zPos = 0;          // piano parallelo al marker
+  const centerScale = 0.3;
+  const zPos = 0;
 
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
 
-  // Scala iniziale impostata da te
-  const initialScales = [
-    0.15, // piece1
-    0.35, // piece2 più piccolo
-    0.15, // piece3
-    0.2,  // piece4 più piccolo
-    0.35, // piece5 più piccolo
-    0.35  // piece6 più piccolo
+  // Scala iniziale
+  const initialScales = [0.15,0.35,0.15,0.2,0.35,0.35];
+
+  // Posizioni personalizzate (ellisse verticale)
+  const positions = [
+    { x: -0.25, y: 0, z: zPos },   // piece1 sinistra
+    { x: 0, y: 0.45, z: zPos },    // piece2 sopra
+    { x: 0.25, y: 0, z: zPos },    // piece3 destra
+    { x: -0.15, y: -0.45, z: zPos },// piece4 sotto
+    { x: 0.15, y: -0.45, z: zPos }, // piece5 sotto
+    { x: 0, y: 0.45, z: zPos }      // piece6 sopra
   ];
 
-  // Parametri ellisse verticale
-  const a = 0.25; // semi-asse orizzontale (X)
-  const b = 0.45; // semi-asse verticale (Y)
-
-  // Centro di snap
-  const centerPos = { x: 0, y: 0, z: zPos };
-  const raggioSnap = 0.1;
-
-  // Creazione dei pezzi lungo l'ellisse verticale
-  for (let i = 0; i < modelIds.length; i++) {
-    const theta = (i / modelIds.length) * 2 * Math.PI;
-    const x = Math.cos(theta) * a;
-    const y = Math.sin(theta) * b;
-
+  // Funzione per creare i pezzi con animazione pop-up
+  function createPiece(i) {
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
-    piece.setAttribute('position', { x, y, z: zPos });
-    piece.setAttribute('scale', {
-      x: initialScales[i],
-      y: initialScales[i],
-      z: initialScales[i]
-    });
+    piece.setAttribute('position', positions[i]);
+    piece.setAttribute('scale', { x: 0, y: 0, z: 0 }); // inizio da 0
     piece.dataset.locked = "false";
+
     container.appendChild(piece);
     pieces.push(piece);
+
+    // Animazione pop-up
+    piece.setAttribute('animation__pop', {
+      property: 'scale',
+      to: `${initialScales[i]} ${initialScales[i]} ${initialScales[i]}`,
+      dur: 500,
+      delay: i * 300, // comparsa uno alla volta
+      easing: 'easeOutElastic'
+    });
+  }
+
+  // Creazione pezzi
+  for (let i = 0; i < modelIds.length; i++) {
+    createPiece(i);
   }
 
   // Drag variables
@@ -60,6 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  const centerPos = { x: 0, y: 0, z: zPos };
+  const raggioSnap = 0.1;
+
   function checkSnap(piece) {
     const pos = piece.object3D.position;
     const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.y - centerPos.y)**2 + (pos.z - centerPos.z)**2);
@@ -73,14 +78,12 @@ document.addEventListener('DOMContentLoaded', () => {
   function onPointerDown(event){
     updateMouse(event);
     raycaster.setFromCamera(mouse, cameraEl.getObject3D('camera'));
-
     const intersects = raycaster.intersectObjects(
       pieces.filter(p => p.dataset.locked === "false").map(p => p.object3D), true
     );
-
     if(intersects.length > 0){
       selectedPiece = intersects[0].object.el;
-      selectedPiece.object3D.position.y += 0.01; // piccolo feedback
+      selectedPiece.object3D.position.y += 0.01;
     }
   }
 
@@ -94,32 +97,26 @@ document.addEventListener('DOMContentLoaded', () => {
     raycaster.ray.direction.clone().normalize().multiplyScalar(distance);
     const targetPos = raycaster.ray.origin.clone().add(dir);
 
-    // Movimento fluido
     const currentPos = selectedPiece.object3D.position;
     const lerpFactor = 0.15;
     currentPos.x += (targetPos.x - currentPos.x) * lerpFactor;
     currentPos.y += (targetPos.y - currentPos.y) * lerpFactor;
-    currentPos.z = zPos; // blocca profondità
+    currentPos.z = zPos;
     selectedPiece.setAttribute('position', {
       x: currentPos.x,
       y: currentPos.y,
       z: currentPos.z
     });
 
-    // Snap automatico
     checkSnap(selectedPiece);
 
-    // Se tutti i pezzi sono bloccati, mostra pezzo finale
     if(pieces.every(p => p.dataset.locked === "true")){
       pieces.forEach(p => { if(p.parentNode) p.parentNode.removeChild(p); });
-
       const finalShape = document.createElement('a-entity');
       finalShape.setAttribute('gltf-model','models/piece_final.glb');
       finalShape.setAttribute('position',{...centerPos});
       finalShape.setAttribute('scale',{x: centerScale, y: centerScale, z: centerScale});
       container.appendChild(finalShape);
-
-      // animazione fluttuazione
       finalShape.setAttribute('animation__float', {
         property: 'position',
         dir: 'alternate',
@@ -133,20 +130,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function onPointerUp(){
     if(selectedPiece){
-      selectedPiece.object3D.position.y -= 0.01; // reset feedback
+      selectedPiece.object3D.position.y -= 0.01;
       selectedPiece = null;
     }
   }
 
-  // Eventi desktop
   window.addEventListener('mousedown', onPointerDown);
   window.addEventListener('mousemove', onPointerMove);
   window.addEventListener('mouseup', onPointerUp);
-
-  // Eventi touch mobile
   window.addEventListener('touchstart', onPointerDown, {passive:false});
   window.addEventListener('touchmove', onPointerMove, {passive:false});
   window.addEventListener('touchend', onPointerUp);
 });
-
-
