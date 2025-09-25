@@ -1,10 +1,10 @@
 document.addEventListener("DOMContentLoaded", () => {
   const container = document.getElementById("pieces");
   const camera = document.querySelector("a-camera");
+  const marker = document.getElementById("marker"); // marker MindAR
 
   const models = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
 
-  // posizioni ellittiche personalizzate (piece6 leggermente a sinistra)
   const positions = [
     { x: 0.25, y: 0, z: 0 },      // piece1 destra
     { x: 0, y: 0.45, z: 0 },      // piece2 sopra
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
 
-  // --- Funzioni drag & snap ---
+  // --- Drag & Snap Functions ---
   function updateMouse(event){
     if(event.touches){
       mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
@@ -57,7 +57,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if(intersects.length > 0){
       selectedPiece = intersects[0].object.el;
-      selectedPiece.object3D.position.y += 0.01; // piccolo feedback
+      selectedPiece.object3D.position.y += 0.01;
     }
   }
 
@@ -75,7 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const lerpFactor = 0.15;
     currentPos.x += (targetPos.x - currentPos.x) * lerpFactor;
     currentPos.y += (targetPos.y - currentPos.y) * lerpFactor;
-    currentPos.z = 0; // blocco profondità
+    currentPos.z = 0;
     selectedPiece.setAttribute('position', currentPos);
 
     checkSnap(selectedPiece);
@@ -90,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
       finalShape.setAttribute('id','finalShape');
       container.appendChild(finalShape);
 
-      // animazione fluttuazione
       finalShape.setAttribute('animation__float', {
         property: 'position',
         dir: 'alternate',
@@ -116,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener('touchmove', onPointerMove, {passive:false});
   window.addEventListener('touchend', onPointerUp);
 
-  // --- Funzione pop-up sequenziale ---
+  // --- Funzione pop-up sequenziale dopo target found ---
   function showNextPiece() {
     if(currentIndex >= models.length) return;
 
@@ -147,5 +146,10 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(showNextPiece, 400);
   }
 
-  showNextPiece();
+  // --- Avvia pop-up solo dopo che il marker è trovato ---
+  marker.addEventListener("targetFound", () => {
+    setTimeout(() => {
+      showNextPiece();
+    }, 500); // 500ms di delay per sicurezza
+  });
 });
