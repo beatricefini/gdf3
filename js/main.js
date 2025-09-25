@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
   const pieces = [];
 
-  const initialScales = [0.15, 0.15, 0.15, 0.15, 0.15, 0.15]; // tutti uguali per animazione
+  const initialScales = [0.15,0.15,0.15,0.15,0.15,0.15];
 
   // Posizioni personalizzate
   const positions = [
@@ -16,28 +16,31 @@ document.addEventListener('DOMContentLoaded', () => {
     { x: -0.25, y: 0, z: zPos },   // piece3 sinistra
     { x: -0.15, y: -0.45, z: zPos },// piece4 sotto
     { x: 0.15, y: -0.45, z: zPos }, // piece5 sotto
-    { x: 0, y: 0.45, z: zPos }      // piece6 sopra
+    { x: 0, y: 0.35, z: zPos }      // piece6 sopra leggermente più basso
   ];
 
   // Creazione pezzi con animazione pop-up
   for (let i = 0; i < modelIds.length; i++) {
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[i]);
-    piece.setAttribute('position', positions[i]);
-    piece.setAttribute('scale', { x: 0, y: 0, z: 0 }); // inizio da 0
+    
+    const pos = {...positions[i]};
+    piece.setAttribute('position', pos);
+
+    piece.setAttribute('scale', { x: 0, y: 0, z: 0 }); // parte da 0
     piece.dataset.locked = "false";
-
-    // Animazione pop-up
-    piece.setAttribute('animation__pop', {
-      property: 'scale',
-      to: `${initialScales[i]} ${initialScales[i]} ${initialScales[i]}`,
-      dur: 500,
-      delay: i * 300, // comparsa uno alla volta
-      easing: 'easeOutElastic'
-    });
-
     container.appendChild(piece);
     pieces.push(piece);
+
+    // Animazione pop-up tramite setTimeout per sicurezza su mobile
+    setTimeout(() => {
+      piece.setAttribute('animation', {
+        property: 'scale',
+        to: `${initialScales[i]} ${initialScales[i]} ${initialScales[i]}`,
+        dur: 500,
+        easing: 'easeOutElastic'
+      });
+    }, i * 300); // comparsa uno alla volta
   }
 
   // Drag variables
@@ -61,7 +64,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function checkSnap(piece) {
     const pos = piece.object3D.position;
-    const distanza = Math.sqrt((pos.x - centerPos.x)**2 + (pos.y - centerPos.y)**2 + (pos.z - centerPos.z)**2);
+    const distanza = Math.sqrt(
+      (pos.x - centerPos.x)**2 +
+      (pos.y - centerPos.y)**2 +
+      (pos.z - centerPos.z)**2
+    );
     if (distanza < raggioSnap) {
       piece.setAttribute('position', { ...centerPos });
       piece.setAttribute('scale', { x: centerScale, y: centerScale, z: centerScale });
@@ -129,9 +136,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  // Eventi desktop
   window.addEventListener('mousedown', onPointerDown);
   window.addEventListener('mousemove', onPointerMove);
   window.addEventListener('mouseup', onPointerUp);
+
+  // Eventi touch mobile
   window.addEventListener('touchstart', onPointerDown, {passive:false});
   window.addEventListener('touchmove', onPointerMove, {passive:false});
   window.addEventListener('touchend', onPointerUp);
