@@ -51,7 +51,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pieces.push(piece);
   }
 
-  // Drag & drop
+  // --- Drag & drop ---
   let selectedPiece = null;
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
@@ -107,17 +107,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     checkSnap(selectedPiece);
 
-    // se tutti i pezzi sono al centro, rimuovi scritta drag
     if(pieces.every(p=>p.dataset.locked==='true')){
       const textEl = document.getElementById('dragText');
       if(textEl) textEl.parentNode.removeChild(textEl);
 
       pieces.forEach(p => { if(p.parentNode) p.parentNode.removeChild(p); });
+
+      // --- CREA MODELLO FINALE ---
       const finalShape = document.createElement('a-entity');
       finalShape.setAttribute('gltf-model','models/piece_final.glb');
       finalShape.setAttribute('position',{...centerPos});
       finalShape.setAttribute('scale',{x:centerScale, y:centerScale, z:centerScale});
       container.appendChild(finalShape);
+
+      // --- ANIMAZIONE FLUTTUANTE ---
       finalShape.setAttribute('animation__float', {
         property: 'position',
         dir: 'alternate',
@@ -126,6 +129,53 @@ document.addEventListener("DOMContentLoaded", () => {
         loop: true,
         to: `${centerPos.x} ${centerPos.y + 0.3} ${centerPos.z}`
       });
+
+      // --- DOPO 3 SECONDI ---
+      setTimeout(() => {
+        finalShape.removeAttribute('animation__float');
+
+        // ridimensiona e sposta in alto a sinistra
+        const topLeftPos = { x: -0.5, y: 0.5, z: 0 };
+        finalShape.setAttribute('animation__move', {
+          property: 'position',
+          to: `${topLeftPos.x} ${topLeftPos.y} ${topLeftPos.z}`,
+          dur: 800,
+          easing: 'easeInOutQuad'
+        });
+        finalShape.setAttribute('animation__scale', {
+          property: 'scale',
+          to: '0.15 0.15 0.15',
+          dur: 800,
+          easing: 'easeInOutQuad'
+        });
+
+        // crea cubo con animazione scaling
+        const cube = document.createElement('a-box');
+        cube.setAttribute('color', '#00FF00');
+        cube.setAttribute('depth', 0.2);
+        cube.setAttribute('height', 0.2);
+        cube.setAttribute('width', 0.2);
+        cube.setAttribute('position', topLeftPos);
+        cube.setAttribute('scale', '0 0 0');
+        container.appendChild(cube);
+
+        cube.setAttribute('animation__pop', {
+          property: 'scale',
+          to: '1 1 1',
+          dur: 500,
+          easing: 'easeOutElastic'
+        });
+
+        // attacca modello sopra cubo con offset
+        const modelOffset = { x: 0, y: 0.15, z: 0 };
+        setTimeout(() => {
+          finalShape.setAttribute('position', {
+            x: topLeftPos.x + modelOffset.x,
+            y: topLeftPos.y + modelOffset.y,
+            z: topLeftPos.z + modelOffset.z
+          });
+        }, 500); // dopo che cubo appare
+      }, 3000);
     }
   }
 
@@ -143,7 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.addEventListener('touchmove', onPointerMove, {passive:false});
   window.addEventListener('touchend', onPointerUp);
 
-  // POP-UP ANIMATION DOPO TARGET FOUND
+  // --- POP-UP ANIMATION DOPO TARGET FOUND ---
   marker.addEventListener('targetFound', () => {
     pieces.length = 0;
     let delay = 0;
