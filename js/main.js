@@ -134,6 +134,21 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         finalShape.removeAttribute('animation__float');
 
+        // Sposta il modello in alto a destra e ridimensiona
+        const finalPos = { x: 0.5, y: 0.5, z: 0 }; // alto a destra
+        finalShape.setAttribute('animation__move', {
+          property: 'position',
+          to: `${finalPos.x} ${finalPos.y} ${finalPos.z}`,
+          dur: 1000,
+          easing: 'easeInOutQuad'
+        });
+        finalShape.setAttribute('animation__scale', {
+          property: 'scale',
+          to: '0.15 0.15 0.15',
+          dur: 1000,
+          easing: 'easeInOutQuad'
+        });
+
         // --- CREA IL CUBO AL CENTRO ---
         const cube = document.createElement('a-box');
         cube.setAttribute('color', '#00FF00');
@@ -144,29 +159,12 @@ document.addEventListener("DOMContentLoaded", () => {
         cube.setAttribute('scale', '0 0 0');
         container.appendChild(cube);
 
+        // Animazione di scaling del cubo
         cube.setAttribute('animation__pop', {
           property: 'scale',
           to: '1 1 1',
           dur: 500,
           easing: 'easeOutElastic'
-        });
-
-        // --- SPOSTA IL MODELLO DAL CUBO ALLA POSIZIONE FINALE ---
-        const finalPos = { x: -0.5, y: 0.5, z: 0 }; // alto a sinistra
-        const modelOffset = { x: 0, y: 0.15, z: 0 };
-
-        finalShape.setAttribute('animation__move', {
-          property: 'position',
-          to: `${finalPos.x + modelOffset.x} ${finalPos.y + modelOffset.y} ${finalPos.z + modelOffset.z}`,
-          dur: 1000,
-          easing: 'easeInOutQuad'
-        });
-
-        finalShape.setAttribute('animation__scale', {
-          property: 'scale',
-          to: '0.15 0.15 0.15',
-          dur: 1000,
-          easing: 'easeInOutQuad'
         });
 
       }, 3000);
