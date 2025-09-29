@@ -134,28 +134,13 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         finalShape.removeAttribute('animation__float');
 
-        // ridimensiona e sposta in alto a sinistra
-        const topLeftPos = { x: -0.5, y: 0.5, z: 0 };
-        finalShape.setAttribute('animation__move', {
-          property: 'position',
-          to: `${topLeftPos.x} ${topLeftPos.y} ${topLeftPos.z}`,
-          dur: 800,
-          easing: 'easeInOutQuad'
-        });
-        finalShape.setAttribute('animation__scale', {
-          property: 'scale',
-          to: '0.15 0.15 0.15',
-          dur: 800,
-          easing: 'easeInOutQuad'
-        });
-
-        // crea cubo con animazione scaling
+        // --- CREA IL CUBO AL CENTRO ---
         const cube = document.createElement('a-box');
         cube.setAttribute('color', '#00FF00');
         cube.setAttribute('depth', 0.2);
         cube.setAttribute('height', 0.2);
         cube.setAttribute('width', 0.2);
-        cube.setAttribute('position', topLeftPos);
+        cube.setAttribute('position', centerPos);
         cube.setAttribute('scale', '0 0 0');
         container.appendChild(cube);
 
@@ -166,15 +151,24 @@ document.addEventListener("DOMContentLoaded", () => {
           easing: 'easeOutElastic'
         });
 
-        // attacca modello sopra cubo con offset
+        // --- SPOSTA IL MODELLO DAL CUBO ALLA POSIZIONE FINALE ---
+        const finalPos = { x: -0.5, y: 0.5, z: 0 }; // alto a sinistra
         const modelOffset = { x: 0, y: 0.15, z: 0 };
-        setTimeout(() => {
-          finalShape.setAttribute('position', {
-            x: topLeftPos.x + modelOffset.x,
-            y: topLeftPos.y + modelOffset.y,
-            z: topLeftPos.z + modelOffset.z
-          });
-        }, 500); // dopo che cubo appare
+
+        finalShape.setAttribute('animation__move', {
+          property: 'position',
+          to: `${finalPos.x + modelOffset.x} ${finalPos.y + modelOffset.y} ${finalPos.z + modelOffset.z}`,
+          dur: 1000,
+          easing: 'easeInOutQuad'
+        });
+
+        finalShape.setAttribute('animation__scale', {
+          property: 'scale',
+          to: '0.15 0.15 0.15',
+          dur: 1000,
+          easing: 'easeInOutQuad'
+        });
+
       }, 3000);
     }
   }
