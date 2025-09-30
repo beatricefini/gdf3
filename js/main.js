@@ -150,22 +150,22 @@ document.addEventListener("DOMContentLoaded", () => {
         });
 
         // --- CREA IL MODELLO piece_cinema3.glb DIRETTAMENTE A DESTRA ---
-        const baseHeight = 0;
+        const baseHeight = -0.2; // più basso
         const cinemaModel = document.createElement('a-entity');
         cinemaModel.setAttribute('gltf-model', 'models/piece_cinema3.glb');
         cinemaModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
-        cinemaModel.setAttribute('scale', { x: 2, y: 2, z: 2 });
+        cinemaModel.setAttribute('scale', { x: 1.2, y: 1.2, z: 1.2 }); // più piccolo
         container.appendChild(cinemaModel);
 
-        // --- Testo "1960" sopra ---
+        // --- Testo "1960" sopra, centrato su X ---
         const text1960 = document.createElement('a-text');
         text1960.setAttribute('value', '1960');
         text1960.setAttribute('align', 'center');
         text1960.setAttribute('anchor', 'center');
         text1960.setAttribute('color', '#000000');
         text1960.setAttribute('font', 'roboto');
-        text1960.setAttribute('position', { x: 0.25, y: baseHeight + 0.7, z: 0 });
-        text1960.setAttribute('scale', '0.7 0.7 0.7');
+        text1960.setAttribute('position', { x: 0, y: baseHeight + 0.5, z: 0 });
+        text1960.setAttribute('scale', '0.5 0.5 0.5'); // più piccolo
         text1960.setAttribute('opacity', '0');
         text1960.setAttribute('shader', 'msdf');
         text1960.setAttribute('negate', 'false');
@@ -179,15 +179,15 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         container.appendChild(text1960);
 
-        // --- Testo "Sculpture" sotto ---
+        // --- Testo "Sculpture" sotto, centrato su X ---
         const textSculpture = document.createElement('a-text');
         textSculpture.setAttribute('value', 'Sculpture');
         textSculpture.setAttribute('align', 'center');
         textSculpture.setAttribute('anchor', 'center');
         textSculpture.setAttribute('color', '#000000');
         textSculpture.setAttribute('font', 'roboto');
-        textSculpture.setAttribute('position', { x: 0.25, y: baseHeight + 0.55, z: 0 });
-        textSculpture.setAttribute('scale', '0.4 0.4 0.4');
+        textSculpture.setAttribute('position', { x: 0, y: baseHeight + 0.35, z: 0 });
+        textSculpture.setAttribute('scale', '0.3 0.3 0.3'); // più piccolo
         textSculpture.setAttribute('opacity', '0');
         textSculpture.setAttribute('shader', 'msdf');
         textSculpture.setAttribute('negate', 'false');
