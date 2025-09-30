@@ -149,21 +149,19 @@ document.addEventListener("DOMContentLoaded", () => {
           easing: 'easeInOutQuad'
         });
 
-        // --- CREA IL CUBO AL CENTRO ---
-        const cube = document.createElement('a-box');
-        cube.setAttribute('color', '#00FF00');
-        cube.setAttribute('depth', 0.2);
-        cube.setAttribute('height', 0.2);
-        cube.setAttribute('width', 0.2);
-        cube.setAttribute('position', centerPos);
-        cube.setAttribute('scale', '0 0 0');
-        container.appendChild(cube);
+        // --- CREA IL MODELLO piece_cinema3.glb DIRETTAMENTE A DESTRA ---
+        const cinemaModel = document.createElement('a-entity');
+        cinemaModel.setAttribute('gltf-model', 'models/piece_cinema3.glb');
+        cinemaModel.setAttribute('position', { x: 0.6, y: 0, z: 0 });
+        cinemaModel.setAttribute('scale', { x: 2, y: 0, z: 2 }); // parte con Y=0
+        container.appendChild(cinemaModel);
 
-        // Animazione di scaling del cubo
-        cube.setAttribute('animation__pop', {
+        // Animazione solo sulla scala Y
+        cinemaModel.setAttribute('animation__growY', {
           property: 'scale',
-          to: '1 1 1',
-          dur: 500,
+          from: '2 0 2',
+          to: '2 2 2',
+          dur: 1000,
           easing: 'easeOutElastic'
         });
 
