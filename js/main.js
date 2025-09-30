@@ -20,9 +20,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const centerScale = 0.3;
   const raggioSnap = 0.1;
 
-  // --- SCRITTA DRAG HERE ---
+  // --- SCRITTA DRAG FRAGMENTS HERE ---
   const dragText = document.createElement('a-text');
-  dragText.setAttribute('value', 'Drag Here');
+  dragText.setAttribute('value', 'Drag\nFragments\nHere'); // 3 righe
   dragText.setAttribute('align', 'center');
   dragText.setAttribute('color', '#FFD700');
   dragText.setAttribute('position', `${centerPos.x} ${centerPos.y + 0.05} ${centerPos.z}`);
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
         finalShape.removeAttribute('animation__float');
 
         // Sposta il modello finale in alto a sinistra e rimpicciolisce ancora
-        const finalPos = { x: -0.2, y: 0.5, z: 0 }; // verso destra per entrare in view
+        const finalPos = { x: -0.2, y: 0.5, z: 0 };
         finalShape.setAttribute('animation__move', {
           property: 'position',
           to: `${finalPos.x} ${finalPos.y} ${finalPos.z}`,
@@ -149,12 +149,12 @@ document.addEventListener("DOMContentLoaded", () => {
           easing: 'easeInOutQuad'
         });
 
-        // --- CREA IL MODELLO piece_cinema3.glb A SINISTRA ---
-        const baseHeight = -0.25; // più basso
+        // --- CREA IL MODELLO piece_cinema3.glb leggermente a destra ---
+        const baseHeight = -0.25;
         const cinemaModel = document.createElement('a-entity');
         cinemaModel.setAttribute('gltf-model', 'models/piece_cinema3.glb');
-        cinemaModel.setAttribute('position', { x: -0.05, y: baseHeight, z: 0 }); // più a sinistra
-        cinemaModel.setAttribute('scale', { x: 0.8, y: 0.8, z: 0.8 }); // più piccolo
+        cinemaModel.setAttribute('position', { x: 0.05, y: baseHeight, z: 0 }); // leggermente a destra
+        cinemaModel.setAttribute('scale', { x: 0.8, y: 0.8, z: 0.8 });
         container.appendChild(cinemaModel);
 
         // --- Testo "1960" sopra, centrato su X ---
