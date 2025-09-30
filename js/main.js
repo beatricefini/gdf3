@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
         finalShape.removeAttribute('animation__float');
 
         // Sposta il modello finale in alto a sinistra e rimpicciolisce ancora
-        const finalPos = { x: -0.2, y: 0.5, z: 0 }; // più verso destra
+        const finalPos = { x: -0.2, y: 0.5, z: 0 }; // verso destra per entrare in view
         finalShape.setAttribute('animation__move', {
           property: 'position',
           to: `${finalPos.x} ${finalPos.y} ${finalPos.z}`,
@@ -149,11 +149,11 @@ document.addEventListener("DOMContentLoaded", () => {
           easing: 'easeInOutQuad'
         });
 
-        // --- CREA IL MODELLO piece_cinema3.glb ---
+        // --- CREA IL MODELLO piece_cinema3.glb A SINISTRA ---
         const baseHeight = -0.25; // più basso
         const cinemaModel = document.createElement('a-entity');
         cinemaModel.setAttribute('gltf-model', 'models/piece_cinema3.glb');
-        cinemaModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
+        cinemaModel.setAttribute('position', { x: -0.05, y: baseHeight, z: 0 }); // più a sinistra
         cinemaModel.setAttribute('scale', { x: 0.8, y: 0.8, z: 0.8 }); // più piccolo
         container.appendChild(cinemaModel);
 
@@ -165,7 +165,7 @@ document.addEventListener("DOMContentLoaded", () => {
         text1960.setAttribute('color', '#000000');
         text1960.setAttribute('font', 'roboto');
         text1960.setAttribute('position', { x: 0, y: baseHeight + 0.5, z: 0 });
-        text1960.setAttribute('scale', '0.35 0.35 0.35');
+        text1960.setAttribute('scale', '0.35 0.35 0.35'); 
         text1960.setAttribute('opacity', '0');
         text1960.setAttribute('shader', 'msdf');
         text1960.setAttribute('negate', 'false');
@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", () => {
         textSculpture.setAttribute('color', '#000000');
         textSculpture.setAttribute('font', 'roboto');
         textSculpture.setAttribute('position', { x: 0, y: baseHeight + 0.35, z: 0 });
-        textSculpture.setAttribute('scale', '0.25 0.25 0.25');
+        textSculpture.setAttribute('scale', '0.25 0.25 0.25'); 
         textSculpture.setAttribute('opacity', '0');
         textSculpture.setAttribute('shader', 'msdf');
         textSculpture.setAttribute('negate', 'false');
