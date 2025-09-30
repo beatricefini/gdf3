@@ -134,8 +134,8 @@ document.addEventListener("DOMContentLoaded", () => {
       setTimeout(() => {
         finalShape.removeAttribute('animation__float');
 
-        // Sposta il modello in alto a destra e ridimensiona
-        const finalPos = { x: 0.5, y: 0.5, z: 0 }; // alto a destra
+        // Sposta il modello finale in alto a sinistra e rimpicciolisce ancora
+        const finalPos = { x: -0.5, y: 0.5, z: 0 };
         finalShape.setAttribute('animation__move', {
           property: 'position',
           to: `${finalPos.x} ${finalPos.y} ${finalPos.z}`,
@@ -144,26 +144,62 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         finalShape.setAttribute('animation__scale', {
           property: 'scale',
-          to: '0.15 0.15 0.15',
+          to: '0.1 0.1 0.1',
           dur: 1000,
           easing: 'easeInOutQuad'
         });
 
         // --- CREA IL MODELLO piece_cinema3.glb DIRETTAMENTE A DESTRA ---
+        const baseHeight = 0;
         const cinemaModel = document.createElement('a-entity');
         cinemaModel.setAttribute('gltf-model', 'models/piece_cinema3.glb');
-        cinemaModel.setAttribute('position', { x: 0.6, y: 0, z: 0 });
-        cinemaModel.setAttribute('scale', { x: 2, y: 0, z: 2 }); // parte con Y=0
+        cinemaModel.setAttribute('position', { x: 0.25, y: baseHeight, z: 0 });
+        cinemaModel.setAttribute('scale', { x: 2, y: 2, z: 2 });
         container.appendChild(cinemaModel);
 
-        // Animazione solo sulla scala Y
-        cinemaModel.setAttribute('animation__growY', {
-          property: 'scale',
-          from: '2 0 2',
-          to: '2 2 2',
-          dur: 1000,
-          easing: 'easeOutElastic'
+        // --- Testo "1960" sopra ---
+        const text1960 = document.createElement('a-text');
+        text1960.setAttribute('value', '1960');
+        text1960.setAttribute('align', 'center');
+        text1960.setAttribute('anchor', 'center');
+        text1960.setAttribute('color', '#000000');
+        text1960.setAttribute('font', 'roboto');
+        text1960.setAttribute('position', { x: 0.25, y: baseHeight + 0.7, z: 0 });
+        text1960.setAttribute('scale', '0.7 0.7 0.7');
+        text1960.setAttribute('opacity', '0');
+        text1960.setAttribute('shader', 'msdf');
+        text1960.setAttribute('negate', 'false');
+        text1960.setAttribute('animation__fadein', {
+          property: 'opacity',
+          from: 0,
+          to: 1,
+          dur: 800,
+          easing: 'easeInQuad',
+          delay: 200
         });
+        container.appendChild(text1960);
+
+        // --- Testo "Sculpture" sotto ---
+        const textSculpture = document.createElement('a-text');
+        textSculpture.setAttribute('value', 'Sculpture');
+        textSculpture.setAttribute('align', 'center');
+        textSculpture.setAttribute('anchor', 'center');
+        textSculpture.setAttribute('color', '#000000');
+        textSculpture.setAttribute('font', 'roboto');
+        textSculpture.setAttribute('position', { x: 0.25, y: baseHeight + 0.55, z: 0 });
+        textSculpture.setAttribute('scale', '0.4 0.4 0.4');
+        textSculpture.setAttribute('opacity', '0');
+        textSculpture.setAttribute('shader', 'msdf');
+        textSculpture.setAttribute('negate', 'false');
+        textSculpture.setAttribute('animation__fadein', {
+          property: 'opacity',
+          from: 0,
+          to: 1,
+          dur: 800,
+          easing: 'easeInQuad',
+          delay: 1200
+        });
+        container.appendChild(textSculpture);
 
       }, 3000);
     }
