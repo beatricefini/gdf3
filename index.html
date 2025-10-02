@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Puzzle Cinema</title>
+  <title>AR Modelli Posizione Manuale</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <style>
@@ -25,7 +25,14 @@
       transition: opacity 1s ease-in-out;
       z-index: 9999;
     }
-    .overlay img { max-width: var(--instructions-scale); max-height: var(--instructions-scale); width: auto; height: auto; }
+
+    .overlay img {
+      max-width: var(--instructions-scale);
+      max-height: var(--instructions-scale);
+      width: auto;
+      height: auto;
+    }
+
     .overlay.show { opacity: 1; }
     .overlay.hide { opacity: 0; }
 
@@ -63,7 +70,12 @@
     #custom-scanning-ui.visible { opacity: 1; pointer-events: none; }
 
     /* Angoli */
-    .corner { position: absolute; width: 40px; height: 40px; border: 6px solid #ffffff; }
+    .corner {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 6px solid #ffffff;
+    }
     .top-left { top: 10%; left: 10%; border-right: none; border-bottom: none; }
     .top-right { top: 10%; right: 10%; border-left: none; border-bottom: none; }
     .bottom-left { bottom: 10%; left: 10%; border-right: none; border-top: none; }
@@ -72,7 +84,7 @@
     /* Barra centrale animata */
     #custom-scanning-ui .scan-bar {
       position: absolute;
-      width: 80%;
+      width: calc(80%);
       height: 6px;
       background: #ffffff;
       top: 10%;
@@ -82,13 +94,10 @@
 
     /* Inizio scena nascosta */
     a-scene { display: none; }
-
-    /* Nascondi pulsante VR di A-Frame */
     .a-enter-vr-button { display: none !important; }
   </style>
 </head>
 <body>
-
   <!-- Overlay 1: count3.png -->
   <div id="introOverlay" class="overlay">
     <img src="images/count3.png" alt="Intro">
@@ -110,9 +119,21 @@
   </div>
 
   <!-- Scena AR -->
-  <a-scene mindar-image="imageTargetSrc: targets/target.mind; uiScanning:#custom-scanning-ui; uiLoading: ; uiError: ;" color-space="sRGB" renderer="colorManagement: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+  <a-scene
+    mindar-image="imageTargetSrc: targets/target.mind;"
+    color-space="sRGB"
+    renderer="colorManagement: true"
+    vr-mode-ui="enabled: false"
+    device-orientation-permission-ui="enabled: false">
+
     <a-assets>
-      <a-asset-item id="cinemaModel" src="models/piece_cinema2.glb"></a-asset-item>
+      <a-asset-item id="piece1" src="models/piece1.glb"></a-asset-item>
+      <a-asset-item id="piece2" src="models/piece2.glb"></a-asset-item>
+      <a-asset-item id="piece3" src="models/piece3.glb"></a-asset-item>
+      <a-asset-item id="piece4" src="models/piece4.glb"></a-asset-item>
+      <a-asset-item id="piece5" src="models/piece5.glb"></a-asset-item>
+      <a-asset-item id="piece6" src="models/piece6.glb"></a-asset-item>
+      <a-asset-item id="pieceCinema" src="models/piece_cinema3.glb"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -120,7 +141,7 @@
     <a-entity light="type: directional; color: #ffffff; intensity: 0.6" position="0 1 1"></a-entity>
 
     <a-entity mindar-image-target="targetIndex: 0" id="marker">
-      <a-entity id="piecesContainer"></a-entity>
+      <a-entity id="pieces"></a-entity>
     </a-entity>
   </a-scene>
 
