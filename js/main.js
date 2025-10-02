@@ -7,12 +7,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const pieces = [];
 
   const positions = [
-    { x: -0.2, y: 0, z: 0 },  
-    { x: -0.5, y: 0.6, z: 0 }, 
-    { x: 0.2, y: 0, z: 0 },   
-    { x: 0.15, y: -0.5, z: 0 }, 
-    { x: 0.15, y: -0.45, z: 0 }, 
-    { x: -0.1, y: 0.3, z: 0 }  
+    { x: -0.2, y: 0, z: 0 },
+    { x: -0.5, y: 0.6, z: 0 },
+    { x: 0.2, y: 0, z: 0 },
+    { x: 0.15, y: -0.5, z: 0 },
+    { x: 0.15, y: -0.45, z: 0 },
+    { x: -0.1, y: 0.3, z: 0 }
   ];
 
   const scales = [0.15,0.35,0.15,0.2,0.35,0.35];
@@ -20,9 +20,39 @@ document.addEventListener("DOMContentLoaded", () => {
   const centerScale = 0.3;
   const raggioSnap = 0.1;
 
+  // --- Overlay & scanner elements ---
+  const intro = document.getElementById("introOverlay");
+  const instructions = document.getElementById("instructionsOverlay");
+  const tapText = document.getElementById("tapText");
+  const scanningUI = document.getElementById("custom-scanning-ui");
+  const sceneEl = document.querySelector("a-scene");
+
+  // --- Mostra overlay iniziali ---
+  setTimeout(() => intro.classList.add("show"), 100);
+  setTimeout(() => {
+    intro.classList.remove("show");
+    intro.classList.add("hide");
+    setTimeout(() => { 
+      intro.remove(); 
+      instructions.style.opacity = 1;
+      setTimeout(() => instructions.classList.add("show"), 100);
+      setTimeout(() => tapText.classList.add("show"), 500);
+
+      instructions.addEventListener("click", async () => {
+        instructions.classList.remove("show");
+        instructions.classList.add("hide");
+        setTimeout(()=> instructions.remove(), 1000);
+
+        sceneEl.style.display = "flex";
+        const mindarSystem = sceneEl.systems["mindar-image-system"];
+        await mindarSystem.start();
+      }, { once: true });
+    }, 1000);
+  }, 5000);
+
   // --- SCRITTA DRAG FRAGMENTS HERE ---
   const dragText = document.createElement('a-text');
-  dragText.setAttribute('value', 'Drag\nFragments\nHere'); // 3 righe
+  dragText.setAttribute('value', 'Drag\nFragments\nHere');
   dragText.setAttribute('align', 'center');
   dragText.setAttribute('color', '#FFD700');
   dragText.setAttribute('position', `${centerPos.x} ${centerPos.y + 0.05} ${centerPos.z}`);
@@ -30,6 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
   dragText.setAttribute('id', 'dragText');
   container.appendChild(dragText);
 
+  // --- Funzione per creare i pezzi ---
   function createPiece(idx){
     const piece = document.createElement('a-entity');
     piece.setAttribute('gltf-model', modelIds[idx]);
@@ -51,7 +82,7 @@ document.addEventListener("DOMContentLoaded", () => {
     pieces.push(piece);
   }
 
-  // --- Drag & drop ---
+  // --- Drag & Drop ---
   let selectedPiece = null;
   const raycaster = new THREE.Raycaster();
   const mouse = new THREE.Vector2();
@@ -133,8 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // --- DOPO 3 SECONDI ---
       setTimeout(() => {
         finalShape.removeAttribute('animation__float');
-
-        // Sposta il modello finale in alto a sinistra e rimpicciolisce ancora
         const finalPos = { x: -0.2, y: 0.5, z: 0 };
         finalShape.setAttribute('animation__move', {
           property: 'position',
@@ -149,15 +178,15 @@ document.addEventListener("DOMContentLoaded", () => {
           easing: 'easeInOutQuad'
         });
 
-        // --- CREA IL MODELLO piece_cinema3.glb leggermente a destra ---
+        // --- CREA MODELLO CINEMA ---
         const baseHeight = -0.25;
         const cinemaModel = document.createElement('a-entity');
         cinemaModel.setAttribute('gltf-model', 'models/piece_cinema3.glb');
-        cinemaModel.setAttribute('position', { x: 0.05, y: baseHeight, z: 0 }); // leggermente a destra
+        cinemaModel.setAttribute('position', { x: 0.05, y: baseHeight, z: 0 });
         cinemaModel.setAttribute('scale', { x: 0.8, y: 0.8, z: 0.8 });
         container.appendChild(cinemaModel);
 
-        // --- Testo "1960" sopra, centrato su X ---
+        // --- Testo "1960" ---
         const text1960 = document.createElement('a-text');
         text1960.setAttribute('value', '1960');
         text1960.setAttribute('align', 'center');
@@ -165,7 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
         text1960.setAttribute('color', '#000000');
         text1960.setAttribute('font', 'roboto');
         text1960.setAttribute('position', { x: 0, y: baseHeight + 0.5, z: 0 });
-        text1960.setAttribute('scale', '0.35 0.35 0.35'); 
+        text1960.setAttribute('scale', '0.35 0.35 0.35');
         text1960.setAttribute('opacity', '0');
         text1960.setAttribute('shader', 'msdf');
         text1960.setAttribute('negate', 'false');
@@ -179,7 +208,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         container.appendChild(text1960);
 
-        // --- Testo "Sculpture" sotto, centrato su X ---
+        // --- Testo "Sculpture" ---
         const textSculpture = document.createElement('a-text');
         textSculpture.setAttribute('value', 'Sculpture');
         textSculpture.setAttribute('align', 'center');
@@ -187,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
         textSculpture.setAttribute('color', '#000000');
         textSculpture.setAttribute('font', 'roboto');
         textSculpture.setAttribute('position', { x: 0, y: baseHeight + 0.35, z: 0 });
-        textSculpture.setAttribute('scale', '0.25 0.25 0.25'); 
+        textSculpture.setAttribute('scale', '0.25 0.25 0.25');
         textSculpture.setAttribute('opacity', '0');
         textSculpture.setAttribute('shader', 'msdf');
         textSculpture.setAttribute('negate', 'false');
@@ -228,4 +257,32 @@ document.addEventListener("DOMContentLoaded", () => {
       delay += 700;
     }
   });
+
+  // --- Overlay finale 10 secondi dopo modello finale ---
+  setTimeout(() => {
+    const outroOverlay = document.createElement('div');
+    outroOverlay.id = "outroOverlay";
+    outroOverlay.style.position="fixed";
+    outroOverlay.style.top="0";
+    outroOverlay.style.left="0";
+    outroOverlay.style.width="100vw";
+    outroOverlay.style.height="100vh";
+    outroOverlay.style.backgroundColor="black";
+    outroOverlay.style.display="flex";
+    outroOverlay.style.justifyContent="center";
+    outroOverlay.style.alignItems="center";
+    outroOverlay.style.zIndex="9999";
+    outroOverlay.style.opacity="0";
+    outroOverlay.style.transition="opacity 1s ease-in-out";
+
+    const img = document.createElement("img");
+    img.src="images/outro3.png";
+    img.style.maxWidth="100%";
+    img.style.maxHeight="100%";
+    outroOverlay.appendChild(img);
+
+    document.body.appendChild(outroOverlay);
+    setTimeout(()=>{outroOverlay.style.opacity="1";},100);
+  }, 10000);
+
 });
