@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Modelli Posizione Manuale</title>
+  <title>AR Puzzle Cinema</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <style>
@@ -50,6 +50,7 @@
       z-index: 10;
       font-family: Arial, sans-serif;
     }
+
     #tapText.show { opacity: 1; }
 
     /* Custom scanning UI */
@@ -66,6 +67,7 @@
       z-index: 998;
       transition: opacity 0.5s ease;
     }
+
     #custom-scanning-ui.hidden { opacity: 0; pointer-events: none; }
     #custom-scanning-ui.visible { opacity: 1; pointer-events: none; }
 
@@ -84,20 +86,25 @@
     /* Barra centrale animata */
     #custom-scanning-ui .scan-bar {
       position: absolute;
-      width: calc(80%);
+      width: 80%;
       height: 6px;
       background: #ffffff;
       top: 10%;
       animation: moveBar 2s infinite alternate ease-in-out;
     }
-    @keyframes moveBar { 0% { top: 10%; } 100% { top: 70%; } }
 
-    /* Inizio scena nascosta */
+    @keyframes moveBar {
+      0% { top: 10%; }
+      100% { top: 70%; }
+    }
+
+    /* Scena inizialmente nascosta */
     a-scene { display: none; }
     .a-enter-vr-button { display: none !important; }
   </style>
 </head>
 <body>
+
   <!-- Overlay 1: count3.png -->
   <div id="introOverlay" class="overlay">
     <img src="images/count3.png" alt="Intro">
@@ -120,13 +127,14 @@
 
   <!-- Scena AR -->
   <a-scene
-    mindar-image="imageTargetSrc: targets/target.mind;"
+    mindar-image="imageTargetSrc: targets/target.mind; ui: false;"
     color-space="sRGB"
     renderer="colorManagement: true"
     vr-mode-ui="enabled: false"
     device-orientation-permission-ui="enabled: false">
 
     <a-assets>
+      <!-- Puzzle piece assets -->
       <a-asset-item id="piece1" src="models/piece1.glb"></a-asset-item>
       <a-asset-item id="piece2" src="models/piece2.glb"></a-asset-item>
       <a-asset-item id="piece3" src="models/piece3.glb"></a-asset-item>
@@ -134,6 +142,11 @@
       <a-asset-item id="piece5" src="models/piece5.glb"></a-asset-item>
       <a-asset-item id="piece6" src="models/piece6.glb"></a-asset-item>
       <a-asset-item id="pieceCinema" src="models/piece_cinema3.glb"></a-asset-item>
+
+      <!-- Overlay immagini -->
+      <img id="count3Img" src="images/count3.png">
+      <img id="instructionsImg" src="images/instructions.png">
+      <img id="outro3Img" src="images/outro3.png">
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -143,6 +156,7 @@
     <a-entity mindar-image-target="targetIndex: 0" id="marker">
       <a-entity id="pieces"></a-entity>
     </a-entity>
+
   </a-scene>
 
   <script src="js/main.js"></script>
