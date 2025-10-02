@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AR Modelli Posizione Manuale</title>
+  <title>AR Puzzle Cinema</title>
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
-
   <style>
+    :root { --instructions-scale: 100%; }
+
+    /* Overlay base */
     .overlay {
       position: fixed;
-      top:0; left:0;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
       background: black;
@@ -22,9 +25,11 @@
       transition: opacity 1s ease-in-out;
       z-index: 9999;
     }
+    .overlay img { max-width: var(--instructions-scale); max-height: var(--instructions-scale); width: auto; height: auto; }
     .overlay.show { opacity: 1; }
     .overlay.hide { opacity: 0; }
 
+    /* Testo Tap to Start */
     #tapText {
       position: absolute;
       bottom: 10%;
@@ -36,13 +41,17 @@
       transition: opacity 1s ease-in-out;
       cursor: pointer;
       z-index: 10;
+      font-family: Arial, sans-serif;
     }
     #tapText.show { opacity: 1; }
 
+    /* Custom scanning UI */
     #custom-scanning-ui {
       position: fixed;
-      top:0; left:0;
-      width: 100vw; height: 100vh;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
       pointer-events: none;
       display: flex;
       justify-content: center;
@@ -50,28 +59,32 @@
       z-index: 998;
       transition: opacity 0.5s ease;
     }
-    #custom-scanning-ui.hidden { opacity:0; pointer-events:none; }
-    #custom-scanning-ui.visible { opacity:1; pointer-events:none; }
+    #custom-scanning-ui.hidden { opacity: 0; pointer-events: none; }
+    #custom-scanning-ui.visible { opacity: 1; pointer-events: none; }
 
-    .corner {
-      position: absolute;
-      width: 40px; height: 40px;
-      border: 6px solid #fff;
-    }
-    .top-left { top:10%; left:10%; border-right:none; border-bottom:none; }
-    .top-right { top:10%; right:10%; border-left:none; border-bottom:none; }
-    .bottom-left { bottom:10%; left:10%; border-right:none; border-top:none; }
-    .bottom-right { bottom:10%; right:10%; border-left:none; border-top:none; }
+    /* Angoli */
+    .corner { position: absolute; width: 40px; height: 40px; border: 6px solid #ffffff; }
+    .top-left { top: 10%; left: 10%; border-right: none; border-bottom: none; }
+    .top-right { top: 10%; right: 10%; border-left: none; border-bottom: none; }
+    .bottom-left { bottom: 10%; left: 10%; border-right: none; border-top: none; }
+    .bottom-right { bottom: 10%; right: 10%; border-left: none; border-top: none; }
 
+    /* Barra centrale animata */
     #custom-scanning-ui .scan-bar {
-      position:absolute;
+      position: absolute;
       width: 80%;
-      height:6px;
-      background:#fff;
-      top:10%;
+      height: 6px;
+      background: #ffffff;
+      top: 10%;
       animation: moveBar 2s infinite alternate ease-in-out;
     }
-    @keyframes moveBar { 0%{top:10%;} 100%{top:70%;} }
+    @keyframes moveBar { 0% { top: 10%; } 100% { top: 70%; } }
+
+    /* Inizio scena nascosta */
+    a-scene { display: none; }
+
+    /* Nascondi pulsante VR di A-Frame */
+    .a-enter-vr-button { display: none !important; }
   </style>
 </head>
 <body>
@@ -87,7 +100,7 @@
     <div id="tapText">Tap to start</div>
   </div>
 
-  <!-- Custom scanning UI -->
+  <!-- Custom MindAR scanning UI -->
   <div id="custom-scanning-ui" class="visible">
     <div class="corner top-left"></div>
     <div class="corner top-right"></div>
@@ -96,22 +109,10 @@
     <div class="scan-bar"></div>
   </div>
 
-  <a-scene
-    mindar-image="imageTargetSrc: targets/target.mind;"
-    color-space="sRGB"
-    renderer="colorManagement: true"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false"
-    style="display:none;">
-
+  <!-- Scena AR -->
+  <a-scene mindar-image="imageTargetSrc: targets/target.mind; uiScanning:#custom-scanning-ui; uiLoading: ; uiError: ;" color-space="sRGB" renderer="colorManagement: true" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
     <a-assets>
-      <a-asset-item id="piece1" src="models/piece1.glb"></a-asset-item>
-      <a-asset-item id="piece2" src="models/piece2.glb"></a-asset-item>
-      <a-asset-item id="piece3" src="models/piece3.glb"></a-asset-item>
-      <a-asset-item id="piece4" src="models/piece4.glb"></a-asset-item>
-      <a-asset-item id="piece5" src="models/piece5.glb"></a-asset-item>
-      <a-asset-item id="piece6" src="models/piece6.glb"></a-asset-item>
-      <a-asset-item id="pieceCinema" src="models/piece_cinema3.glb"></a-asset-item>
+      <a-asset-item id="cinemaModel" src="models/piece_cinema2.glb"></a-asset-item>
     </a-assets>
 
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
@@ -119,9 +120,8 @@
     <a-entity light="type: directional; color: #ffffff; intensity: 0.6" position="0 1 1"></a-entity>
 
     <a-entity mindar-image-target="targetIndex: 0" id="marker">
-      <a-entity id="pieces"></a-entity>
+      <a-entity id="piecesContainer"></a-entity>
     </a-entity>
-
   </a-scene>
 
   <script src="js/main.js"></script>
