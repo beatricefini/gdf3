@@ -7,85 +7,109 @@
   <script src="https://aframe.io/releases/1.6.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
   <style>
-    body, html { margin:0; padding:0; overflow:hidden; }
+    :root { --instructions-scale: 100%; }
+
+    /* Overlay base */
     .overlay {
       position: fixed;
-      top:0; left:0;
-      width:100vw; height:100vh;
-      background:black;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      opacity:0;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: black;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      opacity: 0;
       transition: opacity 1s ease-in-out;
-      z-index:9999;
-      flex-direction:column;
+      z-index: 9999;
     }
-    .overlay.show { opacity:1; }
-    .overlay.hide { opacity:0; }
-    .overlay img { max-width: 80%; max-height: 80%; }
-    #tapText {
-      position:absolute;
-      bottom:10%;
-      width:100%;
-      text-align:center;
-      font-size:1.2rem;
-      color:white;
-      cursor:pointer;
-      opacity:0;
-      transition: opacity 1s;
-    }
-    #tapText.show { opacity:1; }
 
-    /* Scanner UI personalizzato */
+    .overlay img {
+      max-width: var(--instructions-scale);
+      max-height: var(--instructions-scale);
+      width: auto;
+      height: auto;
+    }
+
+    .overlay.show { opacity: 1; }
+    .overlay.hide { opacity: 0; }
+
+    /* Testo Tap to Start */
+    #tapText {
+      position: absolute;
+      bottom: 10%;
+      width: 100%;
+      text-align: center;
+      font-size: 1.2rem;
+      color: black;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+      cursor: pointer;
+      z-index: 10;
+      font-family: Arial, sans-serif;
+    }
+    #tapText.show { opacity: 1; }
+
+    /* Custom scanning UI */
     #custom-scanning-ui {
       position: fixed;
-      top:0; left:0;
-      width:100vw; height:100vh;
-      pointer-events:none;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-      z-index:998;
-      transition: opacity 0.5s;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 998;
+      transition: opacity 0.5s ease;
     }
-    #custom-scanning-ui.hidden { opacity:0; }
-    #custom-scanning-ui.visible { opacity:1; }
+    #custom-scanning-ui.hidden { opacity: 0; pointer-events: none; }
+    #custom-scanning-ui.visible { opacity: 1; pointer-events: none; }
+
+    /* Angoli */
     .corner {
-      position:absolute;
-      width:40px; height:40px;
-      border:6px solid #ffffff;
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 6px solid #ffffff;
     }
-    .top-left { top:10%; left:10%; border-right:none; border-bottom:none; }
-    .top-right { top:10%; right:10%; border-left:none; border-bottom:none; }
-    .bottom-left { bottom:10%; left:10%; border-right:none; border-top:none; }
-    .bottom-right { bottom:10%; right:10%; border-left:none; border-top:none; }
+    .top-left { top: 10%; left: 10%; border-right: none; border-bottom: none; }
+    .top-right { top: 10%; right: 10%; border-left: none; border-bottom: none; }
+    .bottom-left { bottom: 10%; left: 10%; border-right: none; border-top: none; }
+    .bottom-right { bottom: 10%; right: 10%; border-left: none; border-top: none; }
+
+    /* Barra centrale animata */
     #custom-scanning-ui .scan-bar {
-      position:absolute; width:80%; height:6px;
-      background:#ffffff; top:10%;
+      position: absolute;
+      width: calc(80%);
+      height: 6px;
+      background: #ffffff;
+      top: 10%;
       animation: moveBar 2s infinite alternate ease-in-out;
     }
-    @keyframes moveBar { 0% { top:10%; } 100% { top:70%; } }
+    @keyframes moveBar { 0% { top: 10%; } 100% { top: 70%; } }
 
-    /* Scena inizialmente nascosta */
-    a-scene { display:none; }
-    .a-enter-vr-button { display:none !important; }
+    /* Inizio scena nascosta */
+    a-scene { display: none; }
+    .a-enter-vr-button { display: none !important; }
   </style>
 </head>
 <body>
-
-  <!-- Overlay 1 -->
+  <!-- Overlay 1: count3.png -->
   <div id="introOverlay" class="overlay">
     <img src="images/count3.png" alt="Intro">
   </div>
 
-  <!-- Overlay 2 -->
-  <div id="instructionsOverlay" class="overlay">
+  <!-- Overlay 2: instructions.png -->
+  <div id="instructionsOverlay" class="overlay" style="display:flex; opacity:0;">
     <img src="images/instructions.png" alt="Instructions">
     <div id="tapText">Tap to start</div>
   </div>
 
-  <!-- Scanner UI personalizzato -->
+  <!-- Custom MindAR scanning UI -->
   <div id="custom-scanning-ui" class="visible">
     <div class="corner top-left"></div>
     <div class="corner top-right"></div>
@@ -96,32 +120,31 @@
 
   <!-- Scena AR -->
   <a-scene
-    mindar-image="imageTargetSrc: targets/target.mind; ui: false;"
-    color-space="sRGB"
-    renderer="colorManagement: true"
-    vr-mode-ui="enabled: false"
-    device-orientation-permission-ui="enabled: false">
+  mindar-image="imageTargetSrc: targets/target.mind; ui: false;"
+  color-space="sRGB"
+  renderer="colorManagement: true"
+  vr-mode-ui="enabled: false"
+  device-orientation-permission-ui="enabled: false">
 
-    <a-assets>
-      <a-asset-item id="piece1" src="models/piece1.glb"></a-asset-item>
-      <a-asset-item id="piece2" src="models/piece2.glb"></a-asset-item>
-      <a-asset-item id="piece3" src="models/piece3.glb"></a-asset-item>
-      <a-asset-item id="piece4" src="models/piece4.glb"></a-asset-item>
-      <a-asset-item id="piece5" src="models/piece5.glb"></a-asset-item>
-      <a-asset-item id="piece6" src="models/piece6.glb"></a-asset-item>
-      <a-asset-item id="pieceCinema" src="models/piece_cinema3.glb"></a-asset-item>
-      <img id="outroImg" src="images/outro3.png">
-    </a-assets>
+  <a-assets>
+    <a-asset-item id="piece1" src="models/piece1.glb"></a-asset-item>
+    <a-asset-item id="piece2" src="models/piece2.glb"></a-asset-item>
+    <a-asset-item id="piece3" src="models/piece3.glb"></a-asset-item>
+    <a-asset-item id="piece4" src="models/piece4.glb"></a-asset-item>
+    <a-asset-item id="piece5" src="models/piece5.glb"></a-asset-item>
+    <a-asset-item id="piece6" src="models/piece6.glb"></a-asset-item>
+    <a-asset-item id="pieceCinema" src="models/piece_cinema3.glb"></a-asset-item>
+  </a-assets>
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
-    <a-entity light="type: ambient; color: #ffffff; intensity: 0.8"></a-entity>
-    <a-entity light="type: directional; color: #ffffff; intensity: 0.6" position="0 1 1"></a-entity>
+  <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+  <a-entity light="type: ambient; color: #ffffff; intensity: 0.8"></a-entity>
+  <a-entity light="type: directional; color: #ffffff; intensity: 0.6" position="0 1 1"></a-entity>
 
-    <a-entity mindar-image-target="targetIndex: 0" id="marker">
-      <a-entity id="pieces"></a-entity>
-    </a-entity>
+  <a-entity mindar-image-target="targetIndex: 0" id="marker">
+    <a-entity id="pieces"></a-entity>
+  </a-entity>
+</a-scene>
 
-  </a-scene>
 
   <script src="js/main.js"></script>
 </body>
