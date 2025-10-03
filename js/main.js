@@ -6,6 +6,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const scanningUI = document.getElementById("custom-scanning-ui");
   const marker = document.getElementById("marker");
 
+  // Variabili globali per gestire stato
+  let puzzleStarted = false;
+  let markerVisible = false;
+
   // --- Overlay 1: count3.png ---
   setTimeout(() => intro.classList.add("show"), 100);
   setTimeout(() => {
@@ -33,21 +37,23 @@ document.addEventListener("DOMContentLoaded", () => {
       // Rimuove pulsante VR se presente
       const vrButton = document.querySelector(".a-enter-vr-button");
       if(vrButton) vrButton.remove();
-
-      // --- Aspetta targetFound per far partire il main ---
     }, { once: true });
   }, 6000);
 
-  // --- SCANNER UI visibile finché il marker non viene trovato ---
+  // --- SCANNER UI ---
   marker.addEventListener('targetFound', () => {
+    markerVisible = true;
     scanningUI.classList.add("hidden");
     scanningUI.classList.remove("visible");
 
-    // Avvia il main drag & drop
-    initDragPuzzle();
+    if(!puzzleStarted){
+      puzzleStarted = true;
+      initDragPuzzle();
+    }
   });
 
   marker.addEventListener('targetLost', () => {
+    markerVisible = false;
     scanningUI.classList.remove("hidden");
     scanningUI.classList.add("visible");
   });
@@ -58,7 +64,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const cameraEl = document.querySelector("a-camera");
 
     const modelIds = ['#piece1','#piece2','#piece3','#piece4','#piece5','#piece6'];
-    const pieces = [];
+    const piecesPlaced = [];
 
     const positions = [
       { x: -0.2, y: 0, z: 0 },  
@@ -103,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
       });
 
       container.appendChild(piece);
-      pieces.push(piece);
+      piecesPlaced.push(piece);
     }
 
     // --- DRAG & DROP ---
@@ -112,6 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const mouse = new THREE.Vector2();
 
     function updateMouse(event){
+      if(!markerVisible) return; // Ignora se target non visibile
       if(event.touches){
         mouse.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.touches[0].clientY / window.innerHeight) * 2 + 1;
@@ -132,10 +139,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function onPointerDown(event){
+      if(!markerVisible) return;
       updateMouse(event);
       raycaster.setFromCamera(mouse, cameraEl.getObject3D('camera'));
       const intersects = raycaster.intersectObjects(
-        pieces.filter(p => p.dataset.locked === "false").map(p => p.object3D), true
+        piecesPlaced.filter(p => p.dataset.locked === "false").map(p => p.object3D), true
       );
       if(intersects.length>0){
         selectedPiece = intersects[0].object.el;
@@ -144,6 +152,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function onPointerMove(event){
+      if(!markerVisible) return;
       if(!selectedPiece || selectedPiece.dataset.locked === "true") return;
       updateMouse(event);
       raycaster.setFromCamera(mouse, cameraEl.getObject3D('camera'));
@@ -161,10 +170,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
       checkSnap(selectedPiece);
 
-      if(pieces.every(p=>p.dataset.locked==='true')){
+      if(piecesPlaced.every(p=>p.dataset.locked==='true')){
         const textEl = document.getElementById('dragText');
         if(textEl) textEl.parentNode.removeChild(textEl);
-        pieces.forEach(p => { if(p.parentNode) p.parentNode.removeChild(p); });
+        piecesPlaced.forEach(p => { if(p.parentNode) p.parentNode.removeChild(p); });
 
         // --- CREA MODELLO FINALE ---
         const finalShape = document.createElement('a-entity');
@@ -281,6 +290,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function onPointerUp(){
+      if(!markerVisible) return;
       if(selectedPiece){
         selectedPiece.object3D.position.y -= 0.01;
         selectedPiece = null;
@@ -295,7 +305,7 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('touchend', onPointerUp);
 
     // --- POP-UP PIECE ANIMATE DOPO TARGET FOUND ---
-    pieces.length = 0;
+    piecesPlaced.length = 0;
     let delay = 0;
     for(let i=0;i<modelIds.length;i++){
       setTimeout(()=> createPiece(i), delay);
